@@ -116,17 +116,21 @@ tasks:
         options:
             drop_missing_schema: True
 
+    set_password:
+        description: Sets a standard password for the default scratch org user
+        class_path: tasks.set_password.SetPassword
+
 ### Flows ######################################################################
 flows:
     config_dev:
         steps:
             3.1:
-                flow: configure_litify_mdapi
+                flow: configure_mdapi
 
     config_apextest:
         steps:
             3.1:
-                flow: configure_litify_mdapi
+                flow: configure_mdapi
 
     configure_mdapi:
         description: Configure Litify MDAPI
@@ -179,3 +183,8 @@ flows:
                 task: grant_connected_app
             9:
                 task: assign_litify_permission_sets
+
+    dependencies:
+        steps:
+            0.1:
+                task: set_password

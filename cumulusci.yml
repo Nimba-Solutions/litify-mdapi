@@ -117,8 +117,11 @@ tasks:
             drop_missing_schema: True
 
     set_password:
-        description: Sets a standard password for the default scratch org user
-        class_path: tasks.set_password.SetPassword
+        description: Sets a password for the current user using Apex
+        class_path: cumulusci.tasks.apex.anon.AnonymousApexTask
+        options:
+            path: scripts/set_password.apex
+            param1: Password1234! # Can be overridden with -o param1=NewPassword123!
 
 ### Flows ######################################################################
 flows:

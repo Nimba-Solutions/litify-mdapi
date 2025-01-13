@@ -157,6 +157,8 @@ flows:
             9:
                 task: assign_litify_permission_sets
             10:
+                task: set_password
+            11:
                 task: edit_and_save_named_credential
 
     configure_mdapi_no_auth:
@@ -183,8 +185,3 @@ flows:
                 task: grant_connected_app
             9:
                 task: assign_litify_permission_sets
-
-    dependencies:
-        steps:
-            0.1:
-                task: set_password

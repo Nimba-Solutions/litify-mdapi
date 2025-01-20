@@ -29,8 +29,6 @@ ${username_field} =             //input[@id='username']
 ${password_field} =             //input[@id='password']
 ${login_button} =               //input[@id='Login']
 ${iframe}                       //*[@id="setupComponent"]/div/div/div/force-aloha-page/div/iframe
-${USERNAME}                     %{SALESFORCE_USERNAME}
-${PASSWORD}                     %{SALESFORCE_PASSWORD}
 
 
 *** Keywords ***
@@ -78,14 +76,8 @@ Click Save
 Login as User
     [Documentation]             Enter User credentials and click Login Button on login page.
     # Getting Access Token and storing variable
-    ${access_token} =           Get From Dictionary        ${ORG_INFO}
-    ...                         access_token
+    ${access_token} =           Get From Dictionary        ${ORG_INFO}    access_token
     Set Suite Variable          ${ACCESS_TOKEN}            ${access_token}
-    # This can be used to get username and password when running locally
-    # ${username}=                Get From Dictionary        ${ORG_INFO}    
-    # ...                         username
-    # ${password}=                Get From Dictionary        ${ORG_INFO}    
-    # ...                         password
     # Setting Username and Password
     Input Text                  ${username_field}            ${USERNAME}
     Input Text                  ${password_field}            ${PASSWORD}

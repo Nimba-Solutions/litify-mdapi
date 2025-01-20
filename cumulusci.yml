@@ -105,17 +105,10 @@ tasks:
 
     set_password:
         description: Sets a password for the current user using Apex
-        class_path: cumulusci.tasks.apex.anon.AnonymousApexTask
+        class_path: tasks.set_password_task.SetPasswordTask
         options:
             path: scripts/set_password.apex
             param1: Password1234!
-
-    store_password:
-        description: Store the password as an environment variable
-        class_path: tasks.set_env_var.SetEnvVar
-        options:
-            env_var_name: SF_PASSWORD
-            value: ^^set_password.options.param1
 
     edit_and_save_named_credential:
         description: "Run the named_credential.robot script"
@@ -127,7 +120,7 @@ tasks:
                 [
                     "BROWSER:headlesschrome",
                     "TIMEOUT:180.0",
-                    "SF_PASSWORD:%{SF_PASSWORD}",
+                    "SF_PASSWORD:^^set_password.password",
                 ]
             exclude: unstable
 
@@ -174,8 +167,6 @@ flows:
             10:
                 task: set_password
             11:
-                task: store_password
-            12:
                 task: edit_and_save_named_credential
 
     configure_mdapi_no_auth:

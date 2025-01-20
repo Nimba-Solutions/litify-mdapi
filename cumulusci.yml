@@ -108,6 +108,7 @@ tasks:
         class_path: tasks.set_password_task.SetPasswordTask
         options:
             path: scripts/set_password.apex
+            param1: ""
 
     edit_and_save_named_credential:
         description: "Run the named_credential.robot script"

@@ -29,6 +29,8 @@ ${username_field} =             //input[@id='username']
 ${password_field} =             //input[@id='password']
 ${login_button} =               //input[@id='Login']
 ${iframe}                       //*[@id="setupComponent"]/div/div/div/force-aloha-page/div/iframe
+${USERNAME}                     %{SALESFORCE_USERNAME}
+${PASSWORD}                     %{SALESFORCE_PASSWORD}
 
 
 *** Keywords ***
@@ -40,13 +42,13 @@ Setup Test Data
     Set Suite Variable          ${ORG_INFO}                 ${org_info}
     
     # Get username/password from org info
-    ${username} =               Get From Dictionary         ${ORG_INFO}         username=username
-    ${password} =               Get From Dictionary         ${ORG_INFO}         password=password
+    ${username} =               Get From Dictionary         ${ORG_INFO}    username
+    ${password} =               Get From Dictionary         ${ORG_INFO}    password
     Set Suite Variable          ${USERNAME}                ${username}
     Set Suite Variable          ${PASSWORD}                ${password}
 
     # Get instance URL
-    ${instance_url} =           Get From Dictionary         ${ORG_INFO}         instance_url=instance_url
+    ${instance_url} =           Get From Dictionary         ${ORG_INFO}    instance_url
     Set Suite Variable          ${INSTANCE_URL}            ${instance_url}
 
 Navigate To Named Credentials
@@ -76,8 +78,14 @@ Click Save
 Login as User
     [Documentation]             Enter User credentials and click Login Button on login page.
     # Getting Access Token and storing variable
-    ${access_token} =           Get From Dictionary        ${ORG_INFO}         access_token=access_token
+    ${access_token} =           Get From Dictionary        ${ORG_INFO}
+    ...                         access_token
     Set Suite Variable          ${ACCESS_TOKEN}            ${access_token}
+    # This can be used to get username and password when running locally
+    # ${username}=                Get From Dictionary        ${ORG_INFO}    
+    # ...                         username
+    # ${password}=                Get From Dictionary        ${ORG_INFO}    
+    # ...                         password
     # Setting Username and Password
     Input Text                  ${username_field}            ${USERNAME}
     Input Text                  ${password_field}            ${PASSWORD}

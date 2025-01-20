@@ -39,11 +39,9 @@ Setup Test Data
     ${org_info} =               Get Org Info
     Set Suite Variable          ${ORG_INFO}                 ${org_info}
     
-    # Get username/password from org info
+    # Get username from org info
     ${username} =               Get From Dictionary         ${ORG_INFO}    username
-    ${password} =               Get From Dictionary         ${ORG_INFO}    password
     Set Suite Variable          ${USERNAME}                ${username}
-    Set Suite Variable          ${PASSWORD}                ${password}
 
     # Get instance URL
     ${instance_url} =           Get From Dictionary         ${ORG_INFO}    instance_url
@@ -80,7 +78,7 @@ Login as User
     Set Suite Variable          ${ACCESS_TOKEN}            ${access_token}
     # Setting Username and Password
     Input Text                  ${username_field}            ${USERNAME}
-    Input Text                  ${password_field}            ${PASSWORD}
+    Input Text                  ${password_field}            ${SF_PASSWORD}
     Click Element               ${login_button}
     Wait Until Page Contains Element 
     ...                         //input[@value='Confirm']

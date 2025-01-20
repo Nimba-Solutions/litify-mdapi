@@ -109,7 +109,12 @@ tasks:
         options:
             suites: robot/Litify/tests/edit_and_save_named_credential.robot
             outputdir: robot/Litify/results
-            vars: ["BROWSER:headlesschrome", "TIMEOUT:180.0"]
+            vars:
+                [
+                    "BROWSER:headlesschrome",
+                    "TIMEOUT:180.0",
+                    "SF_PASSWORD:^^set_password.param1",
+                ]
             exclude: unstable
 
     load_sample_data:

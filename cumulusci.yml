@@ -112,16 +112,10 @@ tasks:
 
     edit_and_save_named_credential:
         description: "Run the named_credential.robot script"
-        class_path: cumulusci.tasks.robotframework.Robot
+        class_path: tasks.robot_wrapper.RobotWrapper
         options:
             suites: robot/Litify/tests/edit_and_save_named_credential.robot
             outputdir: robot/Litify/results
-            vars:
-                [
-                    "BROWSER:headlesschrome",
-                    "TIMEOUT:180.0",
-                    "SF_PASSWORD:^^set_password.password",
-                ]
             exclude: unstable
 
     load_sample_data:

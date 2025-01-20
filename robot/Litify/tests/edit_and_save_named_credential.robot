@@ -29,8 +29,6 @@ ${username_field} =             //input[@id='username']
 ${password_field} =             //input[@id='password']
 ${login_button} =               //input[@id='Login']
 ${iframe}                       //*[@id="setupComponent"]/div/div/div/force-aloha-page/div/iframe
-${USERNAME}                     %{SALESFORCE_USERNAME}
-${PASSWORD}                     %{SALESFORCE_PASSWORD}
 
 
 *** Keywords ***

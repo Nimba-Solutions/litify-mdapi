@@ -113,7 +113,7 @@ tasks:
                 [
                     "BROWSER:headlesschrome",
                     "TIMEOUT:180.0",
-                    "SF_PASSWORD:^^set_password.param1",
+                    "SF_PASSWORD:Password1234!",
                 ]
             exclude: unstable
 

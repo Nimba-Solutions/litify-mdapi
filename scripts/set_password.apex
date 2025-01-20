@@ -1,8 +1,8 @@
 Id userId = UserInfo.getUserId();
 String password = '%%%PARAM_1%%%';
 
-// If no password provided, generate a random one
-if (password == null || password == '' || password == '%%%PARAM_1%%%') {
+// If param1 is "random", generate a random password
+if (password == 'random') {
     // Generate a random password that meets Salesforce requirements
     // At least 8 chars, 1 uppercase, 1 lowercase, 1 number, 1 special char
     String chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -20,6 +20,6 @@ if (password == null || password == '' || password == '%%%PARAM_1%%%') {
         password += String.valueOf(chars.charAt(Math.mod(Math.abs(Crypto.getRandomInteger()), chars.length())));
     }
 }
-
+System.debug('Attempting to set password for user: ' + userId + ' to: ' + password); 
 System.setPassword(userId, password);
-System.debug('Password set for user: ' + userId + ' to: ' + password); 
+System.debug('OK'); 

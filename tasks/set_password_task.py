@@ -1,10 +1,25 @@
 from cumulusci.tasks.apex.anon import AnonymousApexTask
+import random
+import string
 
 class SetPasswordTask(AnonymousApexTask):
-    def _run_task(self):
-        # Log the initial param1 value
-        self.logger.info(f"Initial param1 value: {self.options['param1']}")
+    def _init_options(self, kwargs):
+        super()._init_options(kwargs)
         
+        if self.options.get('param1') == 'random':
+            # Generate a password that meets Salesforce requirements
+            chars = string.ascii_letters + string.digits + '!@#$%^&*()'
+            password = (
+                random.choice(string.ascii_uppercase) +  # 1 uppercase
+                random.choice(string.ascii_lowercase) +  # 1 lowercase
+                random.choice(string.digits) +          # 1 number
+                random.choice('!@#$%^&*()') +          # 1 special
+                ''.join(random.choice(chars) for _ in range(4))  # 4 more random chars
+            )
+            self.options['param1'] = password
+            self.logger.info(f"Generated random password: {password}")
+
+    def _run_task(self):
         # Run the parent task's _run_task to execute the Apex
         super()._run_task()
         

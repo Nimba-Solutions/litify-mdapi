@@ -1,6 +1,8 @@
 Id userId = UserInfo.getUserId();
 String password = '%%%PARAM_1%%%';
 
+System.debug('Initial password value: ' + password);
+
 // If param1 is "random", generate a random password
 if (password == 'random') {
     // Generate a random password that meets Salesforce requirements
@@ -19,7 +21,10 @@ if (password == 'random') {
     for (Integer i = 0; i < 4; i++) {
         password += String.valueOf(chars.charAt(Math.mod(Math.abs(Crypto.getRandomInteger()), chars.length())));
     }
+    
+    System.debug('Generated random password: ' + password);
 }
-System.debug('Attempting to set password for user: ' + userId + ' to: ' + password); 
+
+System.debug('Final password to set: ' + password);
 System.setPassword(userId, password);
-System.debug('OK'); 
+System.debug('Password set successfully'); 

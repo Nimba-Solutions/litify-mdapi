@@ -39,9 +39,9 @@ Setup Heroku Browser
     ${is_heroku}=    Run Keyword And Return Status    Environment Variable Should Exist    DYNO
     Return From Keyword If    not ${is_heroku}
     
-    ${timestamp}=    Evaluate    int(round(time.time() * 1000))    modules=time
     ${options}=    Evaluate    selenium.webdriver.ChromeOptions()    modules=selenium.webdriver
-    Call Method    ${options}    add_argument    --user-data-dir=/tmp/chrome-data-${SUITE NAME}-${timestamp}
+    Call Method    ${options}    add_argument    --headless
+    Call Method    ${options}    add_argument    --disable-gpu
     Call Method    ${options}    add_argument    --no-sandbox
     Call Method    ${options}    add_argument    --disable-dev-shm-usage
     Set Global Variable    ${BROWSER_OPTIONS}    ${options}

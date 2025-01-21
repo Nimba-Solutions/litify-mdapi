@@ -11,25 +11,28 @@ class RobotWrapper(Robot):
         """Create a unique Chrome profile directory with necessary subdirectories."""
         try:
             # Only create profile on Heroku
-            if 'DYNO' not in os.environ:
-                self.logger.info("skipping Chrome profile creation...")
+            if '/app/.heroku' in os.getenv('PATH', ''):
+                self.logger.info("Creating Chrome profile for Heroku environment...")
+                
+                # Create the Chrome profile directory
+                profile_dir = tempfile.mkdtemp(prefix='chrome_profile_')
+                self.logger.info(f"Creating Chrome profile at: {profile_dir}")
+                
+                # Create the necessary subdirectories for the profile
+                for subdir in ['Default', 'Default/Cache', 'Default/GPUCache', 'Default/ShaderCache']:
+                    full_path = os.path.join(profile_dir, subdir)
+                    os.makedirs(full_path, exist_ok=True)
+                    self.logger.info(f"  - Created subdirectory: {full_path}")
+                
+                self.logger.info(f"Successfully created Chrome profile at: {profile_dir}")
+                return profile_dir
+            else:
+                self.logger.info("Skipping Chrome profile creation...")
                 return None
-
-            # Create a unique temporary directory
-            profile_dir = tempfile.mkdtemp(prefix='chrome_profile_')
-            self.logger.info(f"Creating Chrome profile at: {profile_dir}")
-            
-            # Create profile directory structure
-            for subdir in ['Default', 'Default/Cache', 'Default/GPUCache', 'Default/ShaderCache']:
-                full_path = os.path.join(profile_dir, subdir)
-                os.makedirs(full_path, exist_ok=True)
-                self.logger.info(f"  - Created subdirectory: {full_path}")
-            
-            self.logger.info(f"Successfully created Chrome profile at: {profile_dir}")
-            return profile_dir
         except Exception as e:
             self.logger.error(f"Error creating Chrome profile: {str(e)}")
             raise
+
 
     def _init_options(self, kwargs):
         try:
@@ -75,15 +78,3 @@ class RobotWrapper(Robot):
         except Exception as e:
             self.logger.error(f"Error in _init_options: {str(e)}")
             raise
-        finally:
-            # Clean up old profiles
-            try:
-                temp_dir = tempfile.gettempdir()
-                for item in os.listdir(temp_dir):
-                    if item.startswith('chrome_profile_'):
-                        path = os.path.join(temp_dir, item)
-                        if os.path.isdir(path):
-                            shutil.rmtree(path, ignore_errors=True)
-                            self.logger.info(f"Cleaned up old profile: {path}")
-            except Exception as cleanup_error:
-                self.logger.warning(f"Error cleaning up profiles: {str(cleanup_error)}")

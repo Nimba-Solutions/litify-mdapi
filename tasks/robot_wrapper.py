@@ -10,13 +10,14 @@ class RobotWrapper(Robot):
     def _create_chrome_profile(self):
         """Create a unique Chrome profile directory with necessary subdirectories."""
         try:
-            timestamp = int(time.time() * 1000)
-            base_dir = "/tmp/chrome_profiles"
-            profile_dir = os.path.join(base_dir, f"profile_{timestamp}")
-            
-            self.logger.info(f"Creating Chrome profile:")
-            self.logger.info(f"- Base directory: {base_dir}")
-            self.logger.info(f"- Profile directory: {profile_dir}")
+            # Only create profile on Heroku
+            if 'DYNO' not in os.environ:
+                self.logger.info("skipping Chrome profile creation...")
+                return None
+
+            # Create a unique temporary directory
+            profile_dir = tempfile.mkdtemp(prefix='chrome_profile_')
+            self.logger.info(f"Creating Chrome profile at: {profile_dir}")
             
             # Create profile directory structure
             for subdir in ['Default', 'Default/Cache', 'Default/GPUCache', 'Default/ShaderCache']:
@@ -52,12 +53,19 @@ class RobotWrapper(Robot):
             password = self.org_config.password
             self.logger.info(f"Retrieved password: {password}")
 
-            # Create Chrome profile directory
+            # Create Chrome profile directory only on Heroku
             user_data_dir = self._create_chrome_profile()
+            browser_options = ["add_argument('--headless')", "add_argument('--no-sandbox')", "add_argument('--disable-dev-shm-usage')", "add_argument('--disable-gpu')"]
+            
+            if user_data_dir:
+                browser_options.extend([
+                    f"add_argument('--user-data-dir={user_data_dir}')",
+                    "add_argument('--profile-directory=Default')"
+                ])
 
             self.options['vars'] = [
                 "BROWSER:chrome",
-                f"BROWSER_OPTIONS:add_argument('--headless');add_argument('--no-sandbox');add_argument('--disable-dev-shm-usage');add_argument('--disable-gpu');add_argument('--user-data-dir={user_data_dir}');add_argument('--profile-directory=Default')",
+                f"BROWSER_OPTIONS:{';'.join(browser_options)}",
                 "TIMEOUT:180.0",
                 f"SF_PASSWORD:{password}",
                 f"SF_USERNAME:{self.org_config.username}",
@@ -68,13 +76,14 @@ class RobotWrapper(Robot):
             self.logger.error(f"Error in _init_options: {str(e)}")
             raise
         finally:
-            # Clean up old Chrome profiles (optional)
+            # Clean up old profiles
             try:
-                if os.path.exists("/tmp/chrome_profiles"):
-                    for profile in os.listdir("/tmp/chrome_profiles"):
-                        profile_path = os.path.join("/tmp/chrome_profiles", profile)
-                        if os.path.isdir(profile_path) and (time.time() - os.path.getmtime(profile_path)) > 3600:  # Older than 1 hour
-                            shutil.rmtree(profile_path, ignore_errors=True)
-                            self.logger.info(f"Deleted old profile: {profile_path}")
+                temp_dir = tempfile.gettempdir()
+                for item in os.listdir(temp_dir):
+                    if item.startswith('chrome_profile_'):
+                        path = os.path.join(temp_dir, item)
+                        if os.path.isdir(path):
+                            shutil.rmtree(path, ignore_errors=True)
+                            self.logger.info(f"Cleaned up old profile: {path}")
             except Exception as cleanup_error:
                 self.logger.warning(f"Error cleaning up profiles: {str(cleanup_error)}")

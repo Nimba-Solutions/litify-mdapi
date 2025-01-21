@@ -11,7 +11,11 @@ class RobotWrapper(Robot):
         """Create a unique Chrome profile directory with necessary subdirectories."""
         try:
             # Only create profile on Heroku
-            if '/app/.heroku' in os.getenv('PATH', ''):
+            path = os.getenv('PATH', '')
+            self.logger.info(f"Checking PATH: {path}")
+            self.logger.info(f"Contains /app/: {'/app/' in path}")
+            
+            if '/app/' in path:
                 self.logger.info("Creating Chrome profile for Heroku environment...")
                 
                 # Create the Chrome profile directory
@@ -23,6 +27,15 @@ class RobotWrapper(Robot):
                     full_path = os.path.join(profile_dir, subdir)
                     os.makedirs(full_path, exist_ok=True)
                     self.logger.info(f"  - Created subdirectory: {full_path}")
+                
+                # Check if directory is in use
+                try:
+                    lsof_output = subprocess.check_output(f"lsof -w {profile_dir} 2>/dev/null || true", shell=True).decode()
+                    if lsof_output.strip():
+                        self.logger.error(f"Directory {profile_dir} is in use:\n{lsof_output}")
+                        raise Exception(f"Chrome profile directory is already in use by another process")
+                except subprocess.CalledProcessError:
+                    self.logger.warning("Unable to check if directory is in use with lsof")
                 
                 self.logger.info(f"Successfully created Chrome profile at: {profile_dir}")
                 return profile_dir
@@ -58,7 +71,12 @@ class RobotWrapper(Robot):
 
             # Create Chrome profile directory only on Heroku
             user_data_dir = self._create_chrome_profile()
-            browser_options = ["add_argument('--headless')", "add_argument('--no-sandbox')", "add_argument('--disable-dev-shm-usage')", "add_argument('--disable-gpu')"]
+            browser_options = [
+                "add_argument('--headless')", 
+                "add_argument('--no-sandbox')", 
+                "add_argument('--disable-dev-shm-usage')", 
+                "add_argument('--disable-gpu')"
+            ]
             
             if user_data_dir:
                 browser_options.extend([

@@ -110,7 +110,7 @@ tasks:
             path: scripts/set_password.apex
             param1: "random"
 
-    store_robot_password:
+    store_password:
         description: Store the password as an environment variable
         class_path: tasks.set_env_var.SetEnvVar
         options:
@@ -168,6 +168,8 @@ flows:
             10:
                 task: set_password
             11:
+                task: store_password
+            12:
                 task: edit_and_save_named_credential
 
     configure_mdapi_no_auth:

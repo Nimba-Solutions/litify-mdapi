@@ -1,6 +1,8 @@
 from cumulusci.tasks.apex.anon import AnonymousApexTask
-from simple_salesforce.exceptions import SalesforceAuthenticationFailed
-from cumulusci.salesforce_api.utils import get_simple_salesforce_connection
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 import random
 import string
 
@@ -21,23 +23,50 @@ class EnsurePasswordTask(AnonymousApexTask):
             self.options['param1'] = password
             self.logger.info(f"Generated random password: {password}")
 
+    def _verify_password(self, password):
+        """Verify password works by attempting a headless browser login"""
+        try:
+            options = webdriver.ChromeOptions()
+            options.add_argument('--headless')
+            driver = webdriver.Chrome(options=options)
+            
+            # Go to login page
+            driver.get(f"{self.org_config.instance_url}/")
+            
+            # Try to login
+            username_field = driver.find_element(By.ID, "username")
+            password_field = driver.find_element(By.ID, "password")
+            login_button = driver.find_element(By.ID, "Login")
+            
+            username_field.send_keys(self.org_config.username)
+            password_field.send_keys(password)
+            login_button.click()
+            
+            # Wait for either error message or successful login
+            try:
+                error = WebDriverWait(driver, 5).until(
+                    EC.presence_of_element_located((By.ID, "error"))
+                )
+                return False
+            except:
+                return True
+            
+        except Exception as e:
+            self.logger.error(f"Error verifying password: {str(e)}")
+            return False
+        finally:
+            driver.quit()
+
     def _run_task(self):
         needs_new_password = True
         
         # Check if existing password works
         if self.org_config.password:
             self.logger.info("Found existing password, verifying it works...")
-            try:
-                # Try to connect with the password
-                sf = get_simple_salesforce_connection(
-                    self.project_config,
-                    self.org_config,
-                    base_url='login'
-                )
-                # If we get here, password works
+            if self._verify_password(self.org_config.password):
                 self.logger.info("Existing password verified")
                 needs_new_password = False
-            except SalesforceAuthenticationFailed:
+            else:
                 self.logger.info("Existing password is invalid, will set new password")
         
         if needs_new_password:

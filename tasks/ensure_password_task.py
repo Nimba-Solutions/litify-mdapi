@@ -2,7 +2,7 @@ from cumulusci.tasks.apex.anon import AnonymousApexTask
 import random
 import string
 
-class SetPasswordTask(AnonymousApexTask):
+class EnsurePasswordTask(AnonymousApexTask):
     def _init_options(self, kwargs):
         super()._init_options(kwargs)
         
@@ -20,15 +20,18 @@ class SetPasswordTask(AnonymousApexTask):
             self.logger.info(f"Generated random password: {password}")
 
     def _run_task(self):
-        # Run the parent task's _run_task to execute the Apex
-        super()._run_task()
-        
-        # Update the org config's password
-        self.org_config.config['password'] = self.options['param1']
-        self.org_config.save()
-        
-        # Store in return values too
+        # Only set password if it's not already set
+        if not self.org_config.password:
+            self.logger.info("No password found in org config, setting password...")
+            super()._run_task()
+            
+            # Update the org config's password
+            self.org_config.config['password'] = self.options['param1']
+            self.org_config.save()
+        else:
+            self.logger.info("Password already set in org config, skipping...")
+            
+        # Store in return values
         self.return_values = {
-            "password": self.options["param1"]
-        }
-        self.logger.info(f"Stored password in return_values: {self.return_values['password']}") 
+            "password": self.org_config.password
+        } 

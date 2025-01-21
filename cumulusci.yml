@@ -103,9 +103,9 @@ tasks:
             data_files:
                 - "unpackaged/config/litify-mdapi/setupentityaccess.json"
 
-    set_password:
-        description: Sets a password for the current user using Apex
-        class_path: tasks.set_password_task.SetPasswordTask
+    ensure_password:
+        description: Sets a password for the current user using Apex if not already set
+        class_path: tasks.ensure_password_task.EnsurePasswordTask
         options:
             path: scripts/set_password.apex
             param1: "random"
@@ -159,7 +159,7 @@ flows:
             9:
                 task: assign_litify_permission_sets
             10:
-                task: set_password
+                task: ensure_password
             11:
                 task: edit_and_save_named_credential
 

@@ -6,10 +6,16 @@ class RobotWrapper(Robot):
         
         # Get the password from the set_password task's return values
         password = self.project_config.get_return_values("set_password")["password"]
+        self.logger.info(f"Retrieved password from set_password task: {password}")
         
-        # Update the vars list with the password
-        self.options['vars'] = [
+        # Initialize vars if it doesn't exist
+        if 'vars' not in self.options:
+            self.options['vars'] = []
+            
+        # Add our required vars
+        self.options['vars'].extend([
             "BROWSER:headlesschrome",
             "TIMEOUT:180.0",
             f"SF_PASSWORD:{password}",
-        ] 
+        ])
+        self.logger.info("Updated Robot vars with password") 

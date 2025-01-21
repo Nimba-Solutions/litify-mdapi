@@ -1,4 +1,6 @@
 from cumulusci.tasks.apex.anon import AnonymousApexTask
+from simple_salesforce.exceptions import SalesforceAuthenticationFailed
+from cumulusci.salesforce_api.utils import get_simple_salesforce_connection
 import random
 import string
 
@@ -20,16 +22,31 @@ class EnsurePasswordTask(AnonymousApexTask):
             self.logger.info(f"Generated random password: {password}")
 
     def _run_task(self):
-        # Only set password if it's not already set
-        if not self.org_config.password:
-            self.logger.info("No password found in org config, setting password...")
+        needs_new_password = True
+        
+        # Check if existing password works
+        if self.org_config.password:
+            self.logger.info("Found existing password, verifying it works...")
+            try:
+                # Try to connect with the password
+                sf = get_simple_salesforce_connection(
+                    self.project_config,
+                    self.org_config,
+                    base_url='login'
+                )
+                # If we get here, password works
+                self.logger.info("Existing password verified")
+                needs_new_password = False
+            except SalesforceAuthenticationFailed:
+                self.logger.info("Existing password is invalid, will set new password")
+        
+        if needs_new_password:
+            self.logger.info("Setting new password...")
             super()._run_task()
             
             # Update the org config's password
             self.org_config.config['password'] = self.options['param1']
             self.org_config.save()
-        else:
-            self.logger.info("Password already set in org config, skipping...")
             
         # Store in return values
         self.return_values = {

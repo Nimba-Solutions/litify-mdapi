@@ -5,7 +5,6 @@ Library         Process
 Library         cumulusci.robotframework.CumulusCI  ${ORG}
 Library         OperatingSystem
 Suite Setup     Run Keywords
-...             Setup Heroku Browser
 ...             Setup Test Data
 ...             Open Test Browser
 Suite Teardown  Delete Records And Close Browser
@@ -34,18 +33,6 @@ ${iframe}                       //*[@id="setupComponent"]/div/div/div/force-aloh
 
 
 *** Keywords ***
-Setup Heroku Browser
-    [Documentation]    Setup Chrome options specifically for Heroku environment
-    ${is_heroku}=    Run Keyword And Return Status    Environment Variable Should Exist    DYNO
-    Return From Keyword If    not ${is_heroku}
-    
-    ${options}=    Evaluate    selenium.webdriver.ChromeOptions()    modules=selenium.webdriver
-    Call Method    ${options}    add_argument    --headless
-    Call Method    ${options}    add_argument    --disable-gpu
-    Call Method    ${options}    add_argument    --no-sandbox
-    Call Method    ${options}    add_argument    --disable-dev-shm-usage
-    Set Global Variable    ${BROWSER_OPTIONS}    ${options}
-
 Setup Test Data
     [Documentation]             Sets up all data required for test. Get Org Info.
     

@@ -13,7 +13,8 @@ class RobotWrapper(Robot):
             
             # Initialize vars
             self.options['vars'] = [
-                "BROWSER:headlesschrome",
+                "BROWSER:chrome",
+                "BROWSER_OPTIONS:add_argument('--headless')",
                 "TIMEOUT:180.0",
                 f"SF_PASSWORD:{password}",
                 f"SF_USERNAME:{self.org_config.username}",

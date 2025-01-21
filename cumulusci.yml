@@ -110,13 +110,6 @@ tasks:
             path: scripts/set_password.apex
             param1: "random"
 
-    store_password:
-        description: Store the password as an environment variable
-        class_path: tasks.set_env_var.SetEnvVar
-        options:
-            env_var_name: SF_PASSWORD
-            value: ^^set_password.password
-
     edit_and_save_named_credential:
         description: "Run the named_credential.robot script"
         class_path: tasks.robot_wrapper.RobotWrapper
@@ -168,8 +161,6 @@ flows:
             10:
                 task: set_password
             11:
-                task: store_password
-            12:
                 task: edit_and_save_named_credential
 
     configure_mdapi_no_auth:

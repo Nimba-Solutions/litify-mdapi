@@ -1,5 +1,4 @@
 from cumulusci.tasks.robotframework import Robot
-import os
 
 class RobotWrapper(Robot):
     def _init_options(self, kwargs):
@@ -7,12 +6,9 @@ class RobotWrapper(Robot):
             self.logger.info("Starting _init_options")
             super()._init_options(kwargs)
             
-            # Log the initial state
-            self.logger.info(f"Initial options: {self.options}")
-            
-            # Get the password from environment variable
-            password = os.environ.get('SF_PASSWORD')
-            self.logger.info(f"Retrieved password from env: {password}")
+            # Get password from org config
+            password = self.org_config.password
+            self.logger.info(f"Retrieved password from org config: {password}")
             
             # Initialize vars
             self.options['vars'] = [

@@ -23,7 +23,11 @@ class SetPasswordTask(AnonymousApexTask):
         # Run the parent task's _run_task to execute the Apex
         super()._run_task()
         
-        # Store the password value and log it
+        # Update the org config's password
+        self.org_config.config['password'] = self.options['param1']
+        self.org_config.save()
+        
+        # Store in return values too
         self.return_values = {
             "password": self.options["param1"]
         }

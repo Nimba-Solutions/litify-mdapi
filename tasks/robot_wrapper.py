@@ -5,9 +5,25 @@ import subprocess
 import json
 
 class RobotWrapper(Robot):
+    def _cleanup_chrome(self):
+        """Kill any existing Chrome processes"""
+        try:
+            if os.name == 'nt':  # Windows
+                subprocess.run("taskkill /f /im chrome.exe", shell=True, stderr=subprocess.DEVNULL)
+                subprocess.run("taskkill /f /im chromedriver.exe", shell=True, stderr=subprocess.DEVNULL)
+            else:  # Unix
+                subprocess.run("pkill -f chrome", shell=True, stderr=subprocess.DEVNULL)
+                subprocess.run("pkill -f chromedriver", shell=True, stderr=subprocess.DEVNULL)
+            time.sleep(2)  # Give processes time to clean up
+        except Exception as e:
+            self.logger.info(f"Error cleaning up Chrome processes: {e}")
+
     def _init_options(self, kwargs):
         try:
             self.logger.info("Starting _init_options")
+            
+            # Clean up any existing Chrome processes
+            self._cleanup_chrome()
             
             # Log Chrome processes before starting
             if os.name == 'nt':  # Windows
@@ -17,7 +33,7 @@ class RobotWrapper(Robot):
             
             try:
                 chrome_procs = subprocess.check_output(chrome_cmd, shell=True).decode()
-                self.logger.info(f"Chrome processes before starting:\n{chrome_procs}")
+                self.logger.info(f"Chrome processes after cleanup:\n{chrome_procs}")
             except Exception as e:
                 self.logger.info(f"Error checking Chrome processes: {e}")
             
@@ -30,10 +46,13 @@ class RobotWrapper(Robot):
             password = self.org_config.password
             self.logger.info(f"Retrieved password from org config: {password}")
             
-            # Initialize vars
+            # Initialize vars with a unique user data dir
+            timestamp = int(time.time() * 1000)
+            user_data_dir = f"/tmp/chrome_data_{timestamp}"
+            
             self.options['vars'] = [
                 "BROWSER:chrome",
-                "BROWSER_OPTIONS:add_argument('--headless');add_argument('--no-sandbox');add_argument('--disable-dev-shm-usage');add_argument('--disable-gpu')",
+                f"BROWSER_OPTIONS:add_argument('--headless');add_argument('--no-sandbox');add_argument('--disable-dev-shm-usage');add_argument('--disable-gpu');add_argument('--user-data-dir={user_data_dir}');add_argument('--remote-debugging-port=0')",
                 "TIMEOUT:180.0",
                 f"SF_PASSWORD:{password}",
                 f"SF_USERNAME:{self.org_config.username}",

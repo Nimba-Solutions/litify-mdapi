@@ -39,10 +39,9 @@ Setup Test Data
     ${org_info} =               Get Org Info
     Set Suite Variable          ${ORG_INFO}                 ${org_info}
     
-    # Get username from org info
-    ${username} =               Get From Dictionary         ${ORG_INFO}    username
-    Set Suite Variable          ${USERNAME}                ${username}
-
+    # Log the dictionary to see available keys
+    Log Dictionary              ${ORG_INFO}
+    
     # Get instance URL
     ${instance_url} =           Get From Dictionary         ${ORG_INFO}    instance_url
     Set Suite Variable          ${INSTANCE_URL}            ${instance_url}
@@ -77,7 +76,7 @@ Login as User
     ${access_token} =           Get From Dictionary        ${ORG_INFO}    access_token
     Set Suite Variable          ${ACCESS_TOKEN}            ${access_token}
     # Setting Username and Password
-    Input Text                  ${username_field}            ${USERNAME}
+    Input Text                  ${username_field}            ${SF_USERNAME}
     Input Text                  ${password_field}            ${SF_PASSWORD}
     Click Element               ${login_button}
     Wait Until Page Contains Element 

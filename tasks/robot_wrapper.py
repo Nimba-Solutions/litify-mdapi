@@ -1,4 +1,5 @@
 from cumulusci.tasks.robotframework import Robot
+import os
 
 class RobotWrapper(Robot):
     def _init_options(self, kwargs):
@@ -15,6 +16,7 @@ class RobotWrapper(Robot):
                 "BROWSER:headlesschrome",
                 "TIMEOUT:180.0",
                 f"SF_PASSWORD:{password}",
+                f"SF_USERNAME:{self.org_config.username}",
             ]
             self.logger.info(f"Final options: {self.options}")
             

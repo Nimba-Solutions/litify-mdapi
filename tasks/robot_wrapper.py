@@ -1,70 +1,80 @@
 from cumulusci.tasks.robotframework import Robot
 import os
 import time
-import subprocess
 import json
+import subprocess
+import tempfile
+import shutil
 
 class RobotWrapper(Robot):
-    def _cleanup_chrome(self):
-        """Kill any existing Chrome processes"""
+    def _create_chrome_profile(self):
+        """Create a unique Chrome profile directory with necessary subdirectories."""
         try:
-            if os.name == 'nt':  # Windows
-                subprocess.run("taskkill /f /im chrome.exe", shell=True, stderr=subprocess.DEVNULL)
-                subprocess.run("taskkill /f /im chromedriver.exe", shell=True, stderr=subprocess.DEVNULL)
-            else:  # Unix
-                subprocess.run("pkill -f chrome", shell=True, stderr=subprocess.DEVNULL)
-                subprocess.run("pkill -f chromedriver", shell=True, stderr=subprocess.DEVNULL)
-            time.sleep(2)  # Give processes time to clean up
+            timestamp = int(time.time() * 1000)
+            base_dir = "/tmp/chrome_profiles"
+            profile_dir = os.path.join(base_dir, f"profile_{timestamp}")
+            
+            self.logger.info(f"Creating Chrome profile:")
+            self.logger.info(f"- Base directory: {base_dir}")
+            self.logger.info(f"- Profile directory: {profile_dir}")
+            
+            # Create profile directory structure
+            for subdir in ['Default', 'Default/Cache', 'Default/GPUCache', 'Default/ShaderCache']:
+                full_path = os.path.join(profile_dir, subdir)
+                os.makedirs(full_path, exist_ok=True)
+                self.logger.info(f"  - Created subdirectory: {full_path}")
+            
+            self.logger.info(f"Successfully created Chrome profile at: {profile_dir}")
+            return profile_dir
         except Exception as e:
-            self.logger.info(f"Error cleaning up Chrome processes: {e}")
+            self.logger.error(f"Error creating Chrome profile: {str(e)}")
+            raise
 
     def _init_options(self, kwargs):
         try:
             self.logger.info("Starting _init_options")
-            
-            # Clean up any existing Chrome processes
-            self._cleanup_chrome()
-            
-            # Log Chrome processes before starting
-            if os.name == 'nt':  # Windows
-                chrome_cmd = "tasklist /FI \"IMAGENAME eq chrome.exe\" /FI \"IMAGENAME eq chromedriver.exe\""
-            else:  # Unix
-                chrome_cmd = "ps aux | grep -i chrome"
-            
+            self.logger.info(f"Working directory: {os.getcwd()}")
+            self.logger.info(f"Environment variables: {json.dumps(dict(os.environ), default=str)}")
+
+            # Check running Chrome processes
+            chrome_cmd = "ps aux | grep -i chrome" if os.name != 'nt' else "tasklist /FI \"IMAGENAME eq chrome.exe\" /FI \"IMAGENAME eq chromedriver.exe\""
             try:
                 chrome_procs = subprocess.check_output(chrome_cmd, shell=True).decode()
-                self.logger.info(f"Chrome processes after cleanup:\n{chrome_procs}")
+                self.logger.info(f"Running Chrome processes:\n{chrome_procs}")
             except Exception as e:
-                self.logger.info(f"Error checking Chrome processes: {e}")
-            
-            # Log CumulusCI's browser setup
-            self.logger.info(f"Original kwargs: {json.dumps(kwargs, default=str)}")
-            
+                self.logger.warning(f"Unable to list Chrome processes: {str(e)}")
+
             super()._init_options(kwargs)
-            
-            # Get password from org config
+
+            self.logger.info(f"Initial kwargs: {json.dumps(kwargs, default=str)}")
+
+            # Retrieve password from org config
             password = self.org_config.password
-            self.logger.info(f"Retrieved password from org config: {password}")
-            
-            # Initialize vars with a unique user data dir
-            timestamp = int(time.time() * 1000)
-            user_data_dir = f"/tmp/chrome_data_{timestamp}"
-            
+            self.logger.info(f"Retrieved password: {password}")
+
+            # Create Chrome profile directory
+            user_data_dir = self._create_chrome_profile()
+
             self.options['vars'] = [
                 "BROWSER:chrome",
-                f"BROWSER_OPTIONS:add_argument('--headless');add_argument('--no-sandbox');add_argument('--disable-dev-shm-usage');add_argument('--disable-gpu');add_argument('--user-data-dir={user_data_dir}');add_argument('--remote-debugging-port=0')",
+                f"BROWSER_OPTIONS:add_argument('--headless');add_argument('--no-sandbox');add_argument('--disable-dev-shm-usage');add_argument('--disable-gpu');add_argument('--user-data-dir={user_data_dir}');add_argument('--profile-directory=Default')",
                 "TIMEOUT:180.0",
                 f"SF_PASSWORD:{password}",
                 f"SF_USERNAME:{self.org_config.username}",
             ]
+
             self.logger.info(f"Final options: {json.dumps(self.options, default=str)}")
-            
-            # Log environment variables that might affect Chrome
-            chrome_env_vars = {k:v for k,v in os.environ.items() if 'chrome' in k.lower()}
-            self.logger.info(f"Chrome-related environment variables: {json.dumps(chrome_env_vars, default=str)}")
-            
         except Exception as e:
             self.logger.error(f"Error in _init_options: {str(e)}")
-            self.logger.error(f"Error type: {type(e)}")
-            self.logger.error(f"Error class: {e.__class__.__name__}")
-            raise 
+            raise
+        finally:
+            # Clean up old Chrome profiles (optional)
+            try:
+                if os.path.exists("/tmp/chrome_profiles"):
+                    for profile in os.listdir("/tmp/chrome_profiles"):
+                        profile_path = os.path.join("/tmp/chrome_profiles", profile)
+                        if os.path.isdir(profile_path) and (time.time() - os.path.getmtime(profile_path)) > 3600:  # Older than 1 hour
+                            shutil.rmtree(profile_path, ignore_errors=True)
+                            self.logger.info(f"Deleted old profile: {profile_path}")
+            except Exception as cleanup_error:
+                self.logger.warning(f"Error cleaning up profiles: {str(cleanup_error)}")

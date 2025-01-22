@@ -31,7 +31,8 @@ class RobotWrapper(Robot):
                 "add_argument('--no-sandbox')", 
                 "add_argument('--disable-dev-shm-usage')", 
                 "add_argument('--disable-gpu')",
-                "add_argument('--incognito')"  # Run in incognito mode to avoid profile issues
+                "add_argument('--remote-debugging-port=9222')",  # Forces Chrome to use a new temp directory
+                "add_argument('--disable-software-rasterizer')"  # Additional stability on Heroku
             ]
 
             self.options['vars'] = [

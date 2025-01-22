@@ -25,12 +25,3 @@ Log Browser Options
     Log    Browser: ${BROWSER}
     Log    Browser Options: ${BROWSER_OPTIONS}
     Log    Timeout: ${TIMEOUT}
-
-Log CumulusCI Details
-    [Documentation]    Logs CumulusCI configuration details
-    ${org_info}=      Get Org Info
-    Log Dictionary    ${org_info}
-    ${instance_url}=  Get From Dictionary    ${org_info}    instance_url
-    Log    Instance URL: ${instance_url}
-    Log    Username: ${SF_USERNAME}
-    Log    CumulusCI Version: ${CUMULUSCI_VERSION} 

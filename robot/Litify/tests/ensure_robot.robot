@@ -18,14 +18,20 @@ Log Environment Details
 
 Log Browser Options
     [Documentation]    Logs the browser configuration being used
-    ${status}    ${value} =    Run Keyword And Ignore Error    Variable Should Exist    ${BROWSER}
-    Run Keyword If    '${status}' == 'PASS'    Log    Browser: ${BROWSER}
-    ...    ELSE    Log    Browser variable not set
+    ${browser_exists}    ${browser} =    Run Keyword And Ignore Error    Set Variable    ${BROWSER}
+    Run Keyword If    '${browser_exists}' == 'PASS'
+    ...    Log To Console    \nBrowser: ${browser}
+    ...    ELSE
+    ...    Log To Console    \nBrowser variable not set
     
-    ${status}    ${value} =    Run Keyword And Ignore Error    Variable Should Exist    ${BROWSER_OPTIONS}
-    Run Keyword If    '${status}' == 'PASS'    Log    Browser Options: ${BROWSER_OPTIONS}
-    ...    ELSE    Log    Browser options not set
+    ${options_exists}    ${options} =    Run Keyword And Ignore Error    Set Variable    ${BROWSER_OPTIONS}
+    Run Keyword If    '${options_exists}' == 'PASS'
+    ...    Log To Console    \nBrowser Options: ${options}
+    ...    ELSE
+    ...    Log To Console    \nBrowser options not set
     
-    ${status}    ${value} =    Run Keyword And Ignore Error    Variable Should Exist    ${TIMEOUT}
-    Run Keyword If    '${status}' == 'PASS'    Log    Timeout: ${TIMEOUT}
-    ...    ELSE    Log    Timeout not set
+    ${timeout_exists}    ${timeout} =    Run Keyword And Ignore Error    Set Variable    ${TIMEOUT}
+    Run Keyword If    '${timeout_exists}' == 'PASS'
+    ...    Log To Console    \nTimeout: ${timeout}
+    ...    ELSE
+    ...    Log To Console    \nTimeout not set

@@ -126,6 +126,10 @@ tasks:
             outputdir: robot/Litify/results
             exclude: unstable
 
+    force_crash:
+        description: "Forces CCI to crash to test error handling"
+        class_path: tasks.force_crash.ForceCrash
+
     load_sample_data:
         options:
             drop_missing_schema: True
@@ -136,6 +140,8 @@ flows:
         steps:
             1:
                 task: hello_world_robot
+            2:
+                task: force_crash
 
     config_dev:
         steps:

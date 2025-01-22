@@ -26,18 +26,18 @@ class RobotWrapper(Robot):
             password = self.org_config.password
             self.logger.info(f"Retrieved password: {password}")
 
-            browser_options = [
-                "add_argument('--headless')", 
-                "add_argument('--no-sandbox')", 
-                "add_argument('--disable-dev-shm-usage')", 
-                "add_argument('--disable-gpu')",
-                "add_argument('--remote-debugging-port=9222')",  # Forces Chrome to use a new temp directory
-                "add_argument('--disable-software-rasterizer')"  # Additional stability on Heroku
-            ]
+            browser_options = " ".join([
+                "--headless",
+                "--incognito",
+                "--no-sandbox",
+                "--disable-dev-shm-usage",
+                "--disable-gpu",
+                "--remote-debugging-port=9222"
+            ])
 
             self.options['vars'] = [
                 "BROWSER:chrome",
-                f"BROWSER_OPTIONS:{';'.join(browser_options)}",
+                f"BROWSER_OPTIONS:{browser_options}",
                 "TIMEOUT:180.0",
                 f"SF_PASSWORD:{password}",
                 f"SF_USERNAME:{self.org_config.username}",

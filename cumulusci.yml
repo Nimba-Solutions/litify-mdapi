@@ -140,8 +140,6 @@ flows:
         steps:
             1:
                 task: hello_world_robot
-            2:
-                task: force_crash
 
     config_dev:
         steps:

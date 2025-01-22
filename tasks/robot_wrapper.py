@@ -32,9 +32,34 @@ class RobotWrapper(Robot):
                 "--no-sandbox",
                 "--disable-dev-shm-usage",
                 "--disable-gpu",
-                "--remote-debugging-port=9222",
-                "--disable-user-profile",
-                "--user-data-dir=/dev/null"
+                "--disable-software-rasterizer",
+                "--disable-extensions",
+                "--single-process",  # Force single process mode
+                "--no-zygote",      # Disable the zygote process
+                "--disable-setuid-sandbox",
+                "--disable-background-networking",
+                "--disable-background-timer-throttling",
+                "--disable-backgrounding-occluded-windows",
+                "--disable-breakpad",
+                "--disable-client-side-phishing-detection",
+                "--disable-component-update",
+                "--disable-default-apps",
+                "--disable-dev-shm-usage",
+                "--disable-domain-reliability",
+                "--disable-features=site-per-process,TranslateUI",
+                "--disable-hang-monitor",
+                "--disable-ipc-flooding-protection",
+                "--disable-notifications",
+                "--disable-popup-blocking",
+                "--disable-prompt-on-repost",
+                "--disable-renderer-backgrounding",
+                "--disable-sync",
+                "--disable-translate",
+                "--metrics-recording-only",
+                "--no-default-browser-check",
+                "--no-first-run",
+                "--password-store=basic",
+                "--use-mock-keychain"
             ])
 
             self.options['vars'] = [

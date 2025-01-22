@@ -1,7 +1,4 @@
 *** Settings ***
-Resource        cumulusci/robotframework/Salesforce.robot
-Library         cumulusci.robotframework.PageObjects
-Library         cumulusci.robotframework.CumulusCI  ${ORG}
 Library         OperatingSystem
 
 *** Tasks ***
@@ -9,7 +6,6 @@ Verify Robot Framework
     [Documentation]    Verifies that Robot Framework is running correctly and prints session details
     Log Environment Details
     Log Browser Options
-    Log CumulusCI Details
 
 *** Keywords ***
 Log Environment Details
@@ -22,6 +18,14 @@ Log Environment Details
 
 Log Browser Options
     [Documentation]    Logs the browser configuration being used
-    Log    Browser: ${BROWSER}
-    Log    Browser Options: ${BROWSER_OPTIONS}
-    Log    Timeout: ${TIMEOUT}
+    ${status}    ${value} =    Run Keyword And Ignore Error    Variable Should Exist    ${BROWSER}
+    Run Keyword If    '${status}' == 'PASS'    Log    Browser: ${BROWSER}
+    ...    ELSE    Log    Browser variable not set
+    
+    ${status}    ${value} =    Run Keyword And Ignore Error    Variable Should Exist    ${BROWSER_OPTIONS}
+    Run Keyword If    '${status}' == 'PASS'    Log    Browser Options: ${BROWSER_OPTIONS}
+    ...    ELSE    Log    Browser options not set
+    
+    ${status}    ${value} =    Run Keyword And Ignore Error    Variable Should Exist    ${TIMEOUT}
+    Run Keyword If    '${status}' == 'PASS'    Log    Timeout: ${TIMEOUT}
+    ...    ELSE    Log    Timeout not set

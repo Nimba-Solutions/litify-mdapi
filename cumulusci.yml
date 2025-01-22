@@ -118,12 +118,25 @@ tasks:
             outputdir: robot/Litify/results
             exclude: unstable
 
+    hello_world_robot:
+        description: "Confirm that the robot is working"
+        class_path: tasks.robot_wrapper.RobotWrapper
+        options:
+            suites: robot/Litify/tests/ensure_robot.robot
+            outputdir: robot/Litify/results
+            exclude: unstable
+
     load_sample_data:
         options:
             drop_missing_schema: True
 
 ### Flows ######################################################################
 flows:
+    ensure_robot:
+        steps:
+            1:
+                task: hello_world_robot
+
     config_dev:
         steps:
             3.1:

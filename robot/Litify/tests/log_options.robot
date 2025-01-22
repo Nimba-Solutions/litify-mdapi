@@ -1,13 +1,12 @@
 *** Settings ***
 Library         OperatingSystem
 
-*** Tasks ***
+*** Keywords ***
 Verify Robot Framework
     [Documentation]    Verifies that Robot Framework is running correctly and prints session details
     Log Environment Details
     Log Browser Options
 
-*** Keywords ***
 Log Environment Details
     [Documentation]    Logs details about the execution environment
     ${os_info}=       Get Environment Variable    OS    default=Unknown

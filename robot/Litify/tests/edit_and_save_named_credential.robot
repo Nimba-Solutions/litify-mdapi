@@ -8,6 +8,7 @@ Resource        log_options.robot
 Suite Setup     Run Keywords
 ...             Log Environment Details
 ...             Log Browser Options
+...             Log Directory Contents
 ...             Setup Test Data
 ...             Open Test Browser
 Suite Teardown  Delete Records And Close Browser
@@ -102,3 +103,17 @@ Verify Authentication Status Is Authenticated
     Element Should Contain    //*[contains(@id,"authStatusSection")]    
     ...                        Authenticated
     Log                        Named Credential is Authenticated
+
+Log Directory Contents
+    [Documentation]    Logs contents of important directories
+    ${tmp_contents}=    Run Process    ls -la /tmp/    shell=True
+    Log    Contents of /tmp:    level=INFO
+    Log    ${tmp_contents.stdout}    level=INFO
+    
+    ${dev_shm_contents}=    Run Process    ls -la /dev/shm/    shell=True
+    Log    Contents of /dev/shm:    level=INFO
+    Log    ${dev_shm_contents.stdout}    level=INFO
+    
+    ${chrome_contents}=    Run Process    ls -la /app/.chrome-for-testing/    shell=True
+    Log    Contents of /app/.chrome-for-testing:    level=INFO
+    Log    ${chrome_contents.stdout}    level=INFO

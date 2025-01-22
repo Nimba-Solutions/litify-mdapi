@@ -20,9 +20,9 @@ Log Browser Options
     [Documentation]    Logs the browser configuration being used
     ${browser_exists}    ${browser} =    Run Keyword And Ignore Error    Set Variable    ${BROWSER}
     Run Keyword If    '${browser_exists}' == 'PASS'
-    ...    Log    Browser Configuration:\nBrowser: ${browser}    level=INFO
+    ...    Log    Browser: ${browser}    level=INFO
     ...    ELSE
-    ...    Log    Browser Configuration:\nBrowser variable not set    level=INFO
+    ...    Log    Browser variable not set    level=INFO
     
     ${options_exists}    ${options} =    Run Keyword And Ignore Error    Set Variable    ${BROWSER_OPTIONS}
     Run Keyword If    '${options_exists}' == 'PASS'

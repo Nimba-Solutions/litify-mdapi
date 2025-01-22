@@ -4,7 +4,10 @@ Library         cumulusci.robotframework.PageObjects
 Library         Process
 Library         cumulusci.robotframework.CumulusCI  ${ORG}
 Library         OperatingSystem
+Resource        log_options.robot
 Suite Setup     Run Keywords
+...             Log Environment Details
+...             Log Browser Options
 ...             Setup Test Data
 ...             Open Test Browser
 Suite Teardown  Delete Records And Close Browser

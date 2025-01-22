@@ -2,6 +2,7 @@ from cumulusci.tasks.robotframework import Robot
 import os
 import json
 import subprocess
+import time
 
 class RobotWrapper(Robot):
     def _init_options(self, kwargs):
@@ -34,8 +35,8 @@ class RobotWrapper(Robot):
                 "--disable-gpu",
                 "--disable-software-rasterizer",
                 "--disable-extensions",
-                "--single-process",  # Force single process mode
-                "--no-zygote",      # Disable the zygote process
+                "--single-process",
+                "--no-zygote",
                 "--disable-setuid-sandbox",
                 "--disable-background-networking",
                 "--disable-background-timer-throttling",
@@ -59,7 +60,8 @@ class RobotWrapper(Robot):
                 "--no-default-browser-check",
                 "--no-first-run",
                 "--password-store=basic",
-                "--use-mock-keychain"
+                "--use-mock-keychain",
+                f"--user-data-dir=/dev/shm/chrome-{int(time.time())}"
             ])
 
             self.options['vars'] = [

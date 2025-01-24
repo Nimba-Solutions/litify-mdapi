@@ -1,13 +1,13 @@
 *** Settings ***
 Resource        cumulusci/robotframework/Salesforce.robot
+Resource        ../resources/chrome_utils.robot
 Library         cumulusci.robotframework.PageObjects
 Library         Process
 Library         cumulusci.robotframework.CumulusCI  ${ORG}
 Library         OperatingSystem
-Resource        log_options.robot
 Suite Setup     Run Keywords
 ...             Log Environment Details
-...             Log Browser Options
+...             Log Chrome Options
 ...             Log Directory Contents
 ...             Verify Chrome Setup
 ...             Setup Test Data

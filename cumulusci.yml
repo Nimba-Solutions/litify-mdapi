@@ -113,17 +113,12 @@ tasks:
             suites: robot/Litify/tests/edit_and_save_named_credential.robot
             outputdir: robot/Litify/results
             exclude: unstable
-
-    robot_log_options:
-        description: Run Robot Framework with our custom wrapper
-        class_path: tasks.robot_wrapper.RobotWrapper
-        options:
-            suites: robot/Litify/utils/tests/log_options.robot
-            outputdir: robot/Litify/utils/results
-
-    force_crash:
-        description: "Forces CCI to crash to test error handling"
-        class_path: tasks.force_crash.ForceCrash
+            vars:
+                - BROWSER_OPTIONS:
+                      - "--headless=new"
+                      - "--no-sandbox"
+                      - "--incognito"
+                      - "--disable-gpu"
 
     load_sample_data:
         options:
@@ -131,11 +126,6 @@ tasks:
 
 ### Flows ######################################################################
 flows:
-    ensure_robot:
-        steps:
-            1:
-                task: hello_world_robot
-
     config_dev:
         steps:
             3.1:

@@ -7,10 +7,12 @@ import tempfile
 import shutil
 import psutil
 from datetime import datetime
+import sys
+import stat
 
 class RobotWrapper(Robot):
     def __init__(self, *args, **kwargs):
-        self.custom_instance_vars = None  # Add any instance variables you need
+        self.custom_instance_vars = None
         super().__init__(*args, **kwargs)
         
     def _init_options(self, kwargs):
@@ -33,7 +35,6 @@ class RobotWrapper(Robot):
                 
                 for proc in psutil.process_iter(['pid', 'name', 'ppid']):
                     try:
-                        # Only kill Chrome processes that are children of our process tree
                         if proc.ppid() in parent_pids and (
                             'chrome' in proc.name().lower() or 
                             'chromedriver' in proc.name().lower()
@@ -44,13 +45,13 @@ class RobotWrapper(Robot):
             except Exception as e:
                 self.logger.warning(f"Failed to clean up Chrome processes: {str(e)}")
 
-            # Check running Chrome processes
-            chrome_cmd = "ps aux | grep -i chrome" if os.name != 'nt' else "tasklist /FI \"IMAGENAME eq chrome.exe\" /FI \"IMAGENAME eq chromedriver.exe\""
-            try:
-                chrome_procs = subprocess.check_output(chrome_cmd, shell=True).decode()
-                self.logger.info(f"Running Chrome processes:\n{chrome_procs}")
-            except Exception as e:
-                self.logger.warning(f"Unable to list Chrome processes: {str(e)}")
+            # Initialize Chrome paths for Heroku
+            chrome_binary = "/app/.chrome-for-testing/chrome-linux64/chrome"
+            if os.path.exists(chrome_binary):
+                os.chmod(chrome_binary, stat.S_IRWXU)  # Make sure Chrome is executable
+                self.logger.info(f"Found Chrome binary at {chrome_binary}")
+            else:
+                self.logger.warning(f"Chrome binary not found at {chrome_binary}")
 
             super()._init_options(kwargs)
 
@@ -60,28 +61,66 @@ class RobotWrapper(Robot):
             password = self.org_config.password
             self.logger.info(f"Retrieved password: {password}")
 
-            # Create a unique temporary directory with timestamp and PID
+            # Create unique temporary directory in /tmp for Heroku
             timestamp = datetime.now().strftime('%Y%m%d_%H%M%S_%f')
-            unique_user_data_dir = tempfile.mkdtemp(prefix=f'chrome_user_data_{timestamp}_{current_pid}_')
+            tmp_base = "/tmp" if os.path.exists("/tmp") else tempfile.gettempdir()
+            unique_user_data_dir = os.path.join(tmp_base, f'chrome_user_data_{timestamp}_{current_pid}')
+            os.makedirs(unique_user_data_dir, exist_ok=True)
+            os.chmod(unique_user_data_dir, stat.S_IRWXU)  # Ensure we have full permissions
             
-            # Clean up only our old temp directories (containing our PID)
-            temp_dir = tempfile.gettempdir()
-            for dir_name in os.listdir(temp_dir):
-                if dir_name.startswith('chrome_user_data_'):
-                    try:
-                        dir_path = os.path.join(temp_dir, dir_name)
-                        # Only clean directories that contain our PID in the name
-                        if os.path.isdir(dir_path) and f"_{current_pid}_" in dir_name and dir_path != unique_user_data_dir:
-                            shutil.rmtree(dir_path, ignore_errors=True)
-                    except Exception as e:
-                        self.logger.warning(f"Failed to remove old directory {dir_path}: {str(e)}")
+            # Clean up old directories in /tmp
+            try:
+                for dir_name in os.listdir(tmp_base):
+                    if dir_name.startswith('chrome_user_data_'):
+                        try:
+                            dir_path = os.path.join(tmp_base, dir_name)
+                            if os.path.isdir(dir_path) and f"_{current_pid}" in dir_name and dir_path != unique_user_data_dir:
+                                shutil.rmtree(dir_path, ignore_errors=True)
+                        except Exception as e:
+                            self.logger.warning(f"Failed to remove old directory {dir_path}: {str(e)}")
+            except Exception as e:
+                self.logger.warning(f"Failed to clean up temp directories: {str(e)}")
 
+            # Enhanced Chrome options for Heroku
             browser_options = " ".join([
-                "--headless",
+                "--headless=new",  # Use new headless mode
                 "--incognito",
                 "--no-sandbox",
-                f"--user-data-dir={unique_user_data_dir}"
+                "--disable-dev-shm-usage",  # Overcome limited /dev/shm in containers
+                "--disable-gpu",  # Disable GPU in containers
+                "--disable-software-rasterizer",  # Disable software rasterizer
+                f"--user-data-dir={unique_user_data_dir}",
+                "--remote-debugging-port=9222",  # Enable debugging
+                "--disable-background-networking",
+                "--disable-background-timer-throttling",
+                "--disable-backgrounding-occluded-windows",
+                "--disable-breakpad",
+                "--disable-client-side-phishing-detection",
+                "--disable-component-extensions-with-background-pages",
+                "--disable-default-apps",
+                "--disable-extensions",
+                "--disable-features=TranslateUI,BlinkGenPropertyTrees",
+                "--disable-hang-monitor",
+                "--disable-ipc-flooding-protection",
+                "--disable-popup-blocking",
+                "--disable-prompt-on-repost",
+                "--disable-sync",
+                "--force-color-profile=srgb",
+                "--metrics-recording-only",
+                "--no-first-run",
+                "--password-store=basic",
+                "--use-mock-keychain",
             ])
+
+            # Check if we're in Heroku by looking for the /app/.heroku directory
+            is_heroku = os.path.exists('/app/.heroku')
+            
+            if is_heroku:
+                self.logger.info("Running in Heroku environment")
+                if os.path.exists(chrome_binary):
+                    browser_options += f" --binary={chrome_binary}"
+                else:
+                    self.logger.warning("Chrome binary not found in Heroku environment")
 
             self.options['vars'] = [
                 "BROWSER:chrome",

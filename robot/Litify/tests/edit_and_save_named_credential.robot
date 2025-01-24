@@ -9,6 +9,7 @@ Suite Setup     Run Keywords
 ...             Log Environment Details
 ...             Log Browser Options
 ...             Log Directory Contents
+...             Verify Chrome Setup
 ...             Setup Test Data
 ...             Open Test Browser
 Suite Teardown  Delete Records And Close Browser
@@ -37,6 +38,25 @@ ${iframe}                       //*[@id="setupComponent"]/div/div/div/force-aloh
 
 
 *** Keywords ***
+Verify Chrome Setup
+    [Documentation]    Verifies Chrome setup before starting tests
+    ${chrome_setup}=    Run Process    ps aux | grep -i chrome    shell=True
+    Log    Current Chrome processes before test:    level=INFO
+    Log    ${chrome_setup.stdout}    level=INFO
+    
+    ${user_dir}=    Run Process    ls -la /tmp/chrome_user_data_*    shell=True
+    Log    Chrome user directory status:    level=INFO
+    Log    ${user_dir.stdout}    level=INFO
+    
+    ${chrome_permissions}=    Run Process    ls -la /app/.chrome-for-testing/chrome-linux64/chrome    shell=True
+    Log    Chrome binary permissions:    level=INFO
+    Log    ${chrome_permissions.stdout}    level=INFO
+    
+    # Verify temp directory permissions
+    ${tmp_perms}=    Run Process    ls -la /tmp    shell=True
+    Log    Temp directory permissions:    level=INFO
+    Log    ${tmp_perms.stdout}    level=INFO
+
 Setup Test Data
     [Documentation]             Sets up all data required for test. Get Org Info.
     

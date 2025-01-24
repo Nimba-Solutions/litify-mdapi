@@ -1,5 +1,6 @@
 *** Settings ***
 Library         OperatingSystem
+Library         SeleniumLibrary
 
 *** Keywords ***
 Verify Robot Framework
@@ -14,6 +15,10 @@ Log Environment Details
     Log    Operating System: ${os_info}    level=INFO
     Log    PATH: ${path}    level=INFO
     Log    Working Directory: ${CURDIR}    level=INFO
+    ${chrome_path}=    Run Process    which chrome    shell=True
+    Log    Chrome Path: ${chrome_path.stdout}    level=INFO
+    ${chrome_version}=    Run Process    chrome --version    shell=True
+    Log    Chrome Version: ${chrome_version.stdout}    level=INFO
 
 Log Browser Options
     [Documentation]    Logs the browser configuration being used
@@ -34,3 +39,25 @@ Log Browser Options
     ...    Log    Timeout: ${timeout}    level=INFO
     ...    ELSE
     ...    Log    Timeout not set    level=INFO
+
+    # Log Chrome-specific details if browser is Chrome
+    Run Keyword If    '${browser_exists}' == 'PASS' and '${browser}' == 'chrome'    Log Chrome Details
+
+Log Chrome Details
+    [Documentation]    Logs detailed information about Chrome configuration
+    ${tmp_dirs}=    Run Process    ls -la /tmp/chrome*    shell=True
+    Log    Chrome temp directories: ${tmp_dirs.stdout}    level=INFO
+    
+    ${chrome_procs}=    Run Process    ps aux | grep -i chrome    shell=True
+    Log    Running Chrome processes: ${chrome_procs.stdout}    level=INFO
+    
+    ${chrome_binary}=    Run Process    ls -la /app/.chrome-for-testing/chrome-linux64/chrome    shell=True
+    Log    Chrome binary details: ${chrome_binary.stdout}    level=INFO
+    
+    # Try to get Chrome capabilities if webdriver is active
+    ${status}    ${capabilities}=    Run Keyword And Ignore Error
+    ...    Get WebDriver Capabilities
+    Run Keyword If    '${status}' == 'PASS'
+    ...    Log    Chrome capabilities: ${capabilities}    level=INFO
+    ...    ELSE
+    ...    Log    Could not get Chrome capabilities: ${capabilities}    level=INFO

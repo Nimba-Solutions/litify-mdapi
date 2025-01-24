@@ -21,7 +21,6 @@ class EnsurePasswordTask(AnonymousApexTask):
                 ''.join(random.choice(chars) for _ in range(4))  # 4 more random chars
             )
             self.options['param1'] = password
-            self.logger.info(f"Generated random password: {password}")
 
     def _verify_password(self, password):
         """Verify password works by attempting a headless browser login"""
@@ -71,6 +70,9 @@ class EnsurePasswordTask(AnonymousApexTask):
         
         if needs_new_password:
             self.logger.info("Setting new password...")
+            # Log the new password only if we're actually using it
+            if self.options.get('param1') == 'random':
+                self.logger.info(f"Using generated random password: {self.options['param1']}")
             super()._run_task()
             
             # Update the org config's password

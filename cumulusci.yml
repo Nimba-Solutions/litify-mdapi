@@ -119,6 +119,7 @@ tasks:
                       - "--no-sandbox"
                       - "--incognito"
                       - "--disable-gpu"
+                      - "--user-data-dir=tmp/user-data"
 
     load_sample_data:
         options:

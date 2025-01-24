@@ -30,7 +30,8 @@ class RobotWrapper(Robot):
             browser_options = " ".join([
                 "--headless",
                 "--incognito",
-                "--no-sandbox"
+                "--no-sandbox",
+"--user-data-dir=/tmp/chrome-unique-dir-$(date +%s)"
             ])
 
             self.options['vars'] = [

@@ -3,6 +3,7 @@ import os
 import json
 import subprocess
 import time
+import tempfile
 
 class RobotWrapper(Robot):
     def _init_options(self, kwargs):
@@ -27,11 +28,14 @@ class RobotWrapper(Robot):
             password = self.org_config.password
             self.logger.info(f"Retrieved password: {password}")
 
+            # Create a unique temporary directory for Chrome user data
+            unique_user_data_dir = tempfile.mkdtemp(prefix='chrome_user_data_')
+
             browser_options = " ".join([
                 "--headless",
                 "--incognito",
                 "--no-sandbox",
-"--user-data-dir=/tmp/chrome-unique-dir-$(date +%s)"
+                f"--user-data-dir={unique_user_data_dir}"
             ])
 
             self.options['vars'] = [

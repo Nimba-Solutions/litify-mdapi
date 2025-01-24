@@ -45,12 +45,22 @@ class RobotWrapper(Robot):
             except Exception as e:
                 self.logger.warning(f"Failed to clean up Chrome processes: {str(e)}")
 
-            # Initialize Chrome paths for Heroku
-            chrome_binary = "/app/.chrome-for-testing/chrome-linux64/chrome"
-            if os.path.exists(chrome_binary):
+            # Check if we're in Heroku by looking for the /app/.heroku directory
+            is_heroku = os.path.exists('/app/.heroku')
+            
+            # Initialize Chrome paths based on environment
+            if is_heroku:
+                chrome_binary = "/app/.chrome-for-testing/chrome-linux64/chrome"
+                self.logger.info("Running in Heroku environment")
+            else:
+                # For local environment, let Selenium find Chrome automatically
+                chrome_binary = None
+                self.logger.info("Running in local environment")
+
+            if chrome_binary and os.path.exists(chrome_binary):
                 os.chmod(chrome_binary, stat.S_IRWXU)  # Make sure Chrome is executable
                 self.logger.info(f"Found Chrome binary at {chrome_binary}")
-            else:
+            elif chrome_binary:
                 self.logger.warning(f"Chrome binary not found at {chrome_binary}")
 
             super()._init_options(kwargs)
@@ -81,50 +91,46 @@ class RobotWrapper(Robot):
             except Exception as e:
                 self.logger.warning(f"Failed to clean up temp directories: {str(e)}")
 
-            # Enhanced Chrome options for Heroku
-            browser_options = " ".join([
-                "--headless=new",  # Use new headless mode
-                "--incognito",
-                "--no-sandbox",
-                "--disable-dev-shm-usage",  # Overcome limited /dev/shm in containers
-                "--disable-gpu",  # Disable GPU in containers
-                "--disable-software-rasterizer",  # Disable software rasterizer
-                f"--user-data-dir={unique_user_data_dir}",
-                "--remote-debugging-port=9222",  # Enable debugging
-                "--disable-background-networking",
-                "--disable-background-timer-throttling",
-                "--disable-backgrounding-occluded-windows",
-                "--disable-breakpad",
-                "--disable-client-side-phishing-detection",
-                "--disable-component-extensions-with-background-pages",
-                "--disable-default-apps",
-                "--disable-extensions",
-                "--disable-features=TranslateUI,BlinkGenPropertyTrees",
-                "--disable-hang-monitor",
-                "--disable-ipc-flooding-protection",
-                "--disable-popup-blocking",
-                "--disable-prompt-on-repost",
-                "--disable-sync",
-                "--force-color-profile=srgb",
-                "--metrics-recording-only",
-                "--no-first-run",
-                "--password-store=basic",
-                "--use-mock-keychain",
-            ])
+            # Enhanced Chrome options - adapted for both environments
+            browser_options = {
+                "arguments": [
+                    "--headless=new",
+                    "--incognito",
+                    "--no-sandbox",
+                    "--disable-dev-shm-usage",
+                    "--disable-gpu",
+                    "--disable-software-rasterizer",
+                    f"--user-data-dir={unique_user_data_dir}",
+                    "--remote-debugging-port=9222",
+                    "--disable-background-networking",
+                    "--disable-background-timer-throttling",
+                    "--disable-backgrounding-occluded-windows",
+                    "--disable-breakpad",
+                    "--disable-client-side-phishing-detection",
+                    "--disable-component-extensions-with-background-pages",
+                    "--disable-default-apps",
+                    "--disable-extensions",
+                    "--disable-features=TranslateUI,BlinkGenPropertyTrees",
+                    "--disable-hang-monitor",
+                    "--disable-ipc-flooding-protection",
+                    "--disable-popup-blocking",
+                    "--disable-prompt-on-repost",
+                    "--disable-sync",
+                    "--force-color-profile=srgb",
+                    "--metrics-recording-only",
+                    "--no-first-run",
+                    "--password-store=basic",
+                    "--use-mock-keychain",
+                ]
+            }
 
-            # Check if we're in Heroku by looking for the /app/.heroku directory
-            is_heroku = os.path.exists('/app/.heroku')
-            
-            if is_heroku:
-                self.logger.info("Running in Heroku environment")
-                if os.path.exists(chrome_binary):
-                    browser_options += f" --binary={chrome_binary}"
-                else:
-                    self.logger.warning("Chrome binary not found in Heroku environment")
+            # Only set binary location in Heroku
+            if chrome_binary:
+                browser_options["binary_location"] = chrome_binary
 
             self.options['vars'] = [
                 "BROWSER:chrome",
-                f"BROWSER_OPTIONS:{browser_options}",
+                f"BROWSER_OPTIONS:{json.dumps(browser_options)}",  # Pass options as JSON
                 "TIMEOUT:180.0",
                 f"SF_PASSWORD:{password}",
                 f"SF_USERNAME:{self.org_config.username}",

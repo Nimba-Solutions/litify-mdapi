@@ -6,9 +6,6 @@ from tasks.setup_chrome import setup_chrome
 
 class RobotWrapper(Robot):
     def _init_options(self, kwargs):
-        # Initialize parent class first
-        super()._init_options(kwargs)
-        
         # Get workspace directory and system info
         workspace = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         system = platform.system().lower()
@@ -35,22 +32,28 @@ class RobotWrapper(Robot):
             os.chmod(driver_path, 0o755)
             os.chmod(chrome_path, 0o755)
         
-        # Ensure vars exists
-        if "vars" not in self.options:
-            self.options["vars"] = []
-        
+        # Initialize options with our Chrome settings
+        kwargs["options"] = kwargs.get("options", {})
+        if "vars" not in kwargs["options"]:
+            kwargs["options"]["vars"] = []
+            
         # Set browser options
         chrome_args = ["--headless=new", "--no-sandbox", "--incognito"]
         browser_options = {
             "args": chrome_args,
             "binary_location": chrome_path
         }
-        self.options["vars"].extend([
+        
+        # Add our options to kwargs before parent initialization
+        kwargs["options"]["vars"].extend([
             f"BROWSER:chrome",
             f"BROWSER_OPTIONS:{json.dumps(browser_options)}",
             f"SF_USERNAME:{self.org_config.username}",
             f"SF_PASSWORD:{self.org_config.password}",
         ])
+        
+        # Now initialize parent with our settings
+        super()._init_options(kwargs)
 
         # Get Chrome options defined in cumulusci.yml
         for var in self.options.get("vars", []):

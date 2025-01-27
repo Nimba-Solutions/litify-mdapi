@@ -10,6 +10,9 @@ Set Chrome Options
     FOR    ${arg}    IN    @{options_dict}[args]
         Call Method    ${chrome_options}    add_argument    ${arg}
     END
+    # Set binary location if provided
+    ${binary_location}=    Get From Dictionary    ${options_dict}    binary_location    ${None}
+    Run Keyword If    $binary_location is not None    Call Method    ${chrome_options}    binary_location    ${binary_location}
     # Enable logging with proper dictionary
     ${log_prefs}=    Create Dictionary    browser=ALL    driver=ALL
     Call Method    ${chrome_options}    set_capability    goog:loggingPrefs    ${log_prefs}

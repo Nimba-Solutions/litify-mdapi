@@ -116,6 +116,9 @@ tasks:
             vars:
                 - "BROWSER_OPTIONS:--headless=new --no-sandbox --incognito --disable-gpu --user-data-dir"
 
+    install_chromedriver:
+        class_path: tasks.install_chromedriver.InstallChromeDriver
+
     load_sample_data:
         options:
             drop_missing_schema: True

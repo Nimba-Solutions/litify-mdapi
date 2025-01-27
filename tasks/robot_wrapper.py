@@ -1,8 +1,11 @@
 from cumulusci.tasks.robotframework import Robot
 import json
+import os
 
 class RobotWrapper(Robot):
     def _init_options(self, kwargs):
+        os.environ['SE_DISABLE_DRIVER_VERSION_CHECK'] = '1'
+        
         super()._init_options(kwargs)
 
         # Ensure 'vars' key exists in options

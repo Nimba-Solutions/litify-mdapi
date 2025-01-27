@@ -6,6 +6,11 @@ class RobotWrapper(Robot):
     def _init_options(self, kwargs):
         os.environ['SE_DISABLE_DRIVER_VERSION_CHECK'] = '1'
         
+        # Make sure the local ChromeDriver is executable
+        driver_path = os.path.join("drivers", "chromedriver.exe")
+        if os.path.exists(driver_path):
+            os.chmod(driver_path, 0o755)
+        
         super()._init_options(kwargs)
 
         # Ensure 'vars' key exists in options

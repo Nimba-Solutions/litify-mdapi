@@ -54,3 +54,6 @@ $RECYCLE.BIN/
 .idea
 .project
 .settings
+
+# Chrome binaries
+drivers/chrome-*/

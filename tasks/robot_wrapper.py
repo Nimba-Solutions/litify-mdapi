@@ -1,15 +1,33 @@
 from cumulusci.tasks.robotframework import Robot
 import os
 import json
+import platform
+from tasks.setup_chrome import setup_chrome
 
 class RobotWrapper(Robot):
     def _init_options(self, kwargs):
-        os.environ['SE_DISABLE_DRIVER_VERSION_CHECK'] = '1'
+        # Get system info
+        system = platform.system().lower()
         
-        # Make sure the local ChromeDriver is executable
-        driver_path = os.path.join("drivers", "chromedriver.exe")
-        if os.path.exists(driver_path):
+        # Set paths based on platform
+        driver_path = os.path.abspath(os.path.join("drivers", "chromedriver.exe" if system == "windows" else "chromedriver"))
+        chrome_dir = os.path.abspath(os.path.join("drivers", f"chrome-{system}"))
+        chrome_path = os.path.abspath(os.path.join(chrome_dir, 
+            "chrome.exe" if system == "windows" 
+            else "chrome" if system == "linux"
+            else "Contents/MacOS/Google Chrome"))
+        
+        # Install Chrome if needed
+        if not os.path.exists(chrome_path):
+            setup_chrome()
+        
+        os.environ['SE_DISABLE_DRIVER_VERSION_CHECK'] = '1'
+        os.environ['webdriver.chrome.driver'] = driver_path
+        
+        # Make executables executable on Unix systems
+        if system != "windows":
             os.chmod(driver_path, 0o755)
+            os.chmod(chrome_path, 0o755)
         
         super()._init_options(kwargs)
 
@@ -21,7 +39,10 @@ class RobotWrapper(Robot):
         for var in self.options.get("vars", []):
             if isinstance(var, str) and var.startswith("BROWSER_OPTIONS:"):
                 chrome_args = var.split(":", 1)[1].split()
-                browser_options = {"args": chrome_args}
+                browser_options = {
+                    "args": chrome_args,
+                    "binary_location": chrome_path
+                }
                 # Remove the original string version
                 self.options["vars"].remove(var)
                 # Add JSON formatted version

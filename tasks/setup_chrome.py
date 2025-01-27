@@ -3,6 +3,7 @@ import requests
 import zipfile
 import io
 import platform
+import shutil
 
 def setup_chrome():
     system = platform.system().lower()
@@ -23,6 +24,13 @@ def setup_chrome():
         raise Exception(f"Unsupported system: {system} {machine}")
     
     chrome_dir = f"drivers/chrome-{system}"
+    
+    # Clean up existing directories
+    if os.path.exists(chrome_dir):
+        shutil.rmtree(chrome_dir)
+    if os.path.exists("drivers/chrome-win64"):
+        shutil.rmtree("drivers/chrome-win64")
+    
     os.makedirs(chrome_dir, exist_ok=True)
     
     chrome_url = f"https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/116.0.5845.96/{chrome_build}"

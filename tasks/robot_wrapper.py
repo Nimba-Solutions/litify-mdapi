@@ -34,9 +34,8 @@ class RobotWrapper(Robot):
             os.chmod(driver_path, 0o755)
             os.chmod(chrome_path, 0o755)
             
-        # Force ChromeDriver path in Selenium itself
-        from selenium.webdriver.chrome.service import Service
-        Service.path = driver_path
+        # Force ChromeDriver path for Selenium 3
+        os.environ["webdriver.chrome.driver"] = driver_path
         
         # Initialize parent
         super()._init_options(kwargs)

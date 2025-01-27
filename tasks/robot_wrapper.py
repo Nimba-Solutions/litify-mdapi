@@ -25,6 +25,10 @@ class RobotWrapper(Robot):
                 "chrome.exe" if system == "windows" 
                 else "chrome" if system == "linux"
                 else "Contents/MacOS/Google Chrome")
+            # Change to the workspace directory
+            print(f"Changing working directory to: {workspace}")
+            original_dir = os.getcwd()
+            os.chdir(workspace)
         else:
             # We're in the main project, use relative paths
             driver_path = os.path.join("drivers", "chromedriver.exe" if system == "windows" else "chromedriver")
@@ -114,3 +118,8 @@ class RobotWrapper(Robot):
             f"SF_PASSWORD:{self.org_config.password}",
         ])
         print("=== RobotWrapper initialization complete ===\n")
+        
+        # Change back to original directory if we changed it
+        if ".cci" in workspace:
+            print(f"Changing back to original directory: {original_dir}")
+            os.chdir(original_dir)

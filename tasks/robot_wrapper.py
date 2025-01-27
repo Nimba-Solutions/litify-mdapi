@@ -110,7 +110,7 @@ class RobotWrapper(Robot):
         # Create capabilities dict to force Chrome binary
         capabilities = {
             "goog:chromeOptions": {
-                "binary": chrome_path.replace('\\', '/'),
+                "binary": os.path.normpath(chrome_path).replace(os.sep, '/'),
                 "args": chrome_args
             }
         }
@@ -126,7 +126,7 @@ class RobotWrapper(Robot):
         print("=== End Directory Context ===\n")
         
         # Add both browser options and capabilities
-        chrome_options = f"--binary={chrome_path.replace('\\', '/')} {' '.join(chrome_args)}"
+        chrome_options = f"--binary={os.path.normpath(chrome_path).replace(os.sep, '/')} {' '.join(chrome_args)}"
         print(f"Final Chrome options: {chrome_options}")
         
         self.options["vars"].extend([

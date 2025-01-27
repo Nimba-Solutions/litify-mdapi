@@ -4,8 +4,18 @@ import json
 import platform
 from tasks.setup_chrome import setup_chrome
 import logging
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome import service
 
 class RobotWrapper(Robot):
+    def _get_chrome_registry_path(self):
+        try:
+            import winreg
+            with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, r"SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\chrome.exe") as key:
+                return winreg.QueryValue(key, None)
+        except:
+            return "Not found in registry"
+
     def _init_options(self, kwargs):
         # Enable Selenium debug logging
         selenium_logger = logging.getLogger('selenium.webdriver.remote.remote_connection')
@@ -15,6 +25,12 @@ class RobotWrapper(Robot):
         
         print("\n=== Starting RobotWrapper initialization ===")
         print(f"Current working directory: {os.getcwd()}")
+        
+        # Add Selenium service debug info
+        print(f"\n=== Selenium Service Debug ===")
+        print(f"Service module location: {service.__file__}")
+        print(f"Chrome binary in registry: {self._get_chrome_registry_path()}")
+        print("=== End Selenium Service Debug ===\n")
         
         # Get workspace directory and system info
         workspace = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

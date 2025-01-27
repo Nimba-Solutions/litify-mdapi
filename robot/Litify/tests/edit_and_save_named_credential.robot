@@ -6,9 +6,6 @@ Library         cumulusci.robotframework.CumulusCI  ${ORG}
 Library         OperatingSystem
 Resource        ../resources/chrome_utils.robot
 Suite Setup     Run Keywords
-...             Log Environment Details
-...             Log Browser Options
-...             Log Directory Contents
 ...             Setup Test Data
 ...             Open Test Browser
 Suite Teardown  Delete Records And Close Browser

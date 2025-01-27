@@ -6,10 +6,6 @@ Library         Process
 Library         cumulusci.robotframework.CumulusCI  ${ORG}
 Library         OperatingSystem
 Suite Setup     Run Keywords
-...             Log Environment Details
-...             Log Chrome Options
-...             Log Directory Contents
-...             Verify Chrome Setup
 ...             Setup Test Data
 ...             Open Test Browser
 Suite Teardown  Delete Records And Close Browser
@@ -38,25 +34,6 @@ ${iframe}                       //*[@id="setupComponent"]/div/div/div/force-aloh
 
 
 *** Keywords ***
-Verify Chrome Setup
-    [Documentation]    Verifies Chrome setup before starting tests
-    ${chrome_setup}=    Run Process    ps aux | grep -i chrome    shell=True
-    Log    Current Chrome processes before test:    level=INFO
-    Log    ${chrome_setup.stdout}    level=INFO
-    
-    ${user_dir}=    Run Process    ls -la /tmp/chrome_user_data_*    shell=True
-    Log    Chrome user directory status:    level=INFO
-    Log    ${user_dir.stdout}    level=INFO
-    
-    ${chrome_permissions}=    Run Process    ls -la /app/.chrome-for-testing/chrome-linux64/chrome    shell=True
-    Log    Chrome binary permissions:    level=INFO
-    Log    ${chrome_permissions.stdout}    level=INFO
-    
-    # Verify temp directory permissions
-    ${tmp_perms}=    Run Process    ls -la /tmp    shell=True
-    Log    Temp directory permissions:    level=INFO
-    Log    ${tmp_perms.stdout}    level=INFO
-
 Setup Test Data
     [Documentation]             Sets up all data required for test. Get Org Info.
     
@@ -123,17 +100,3 @@ Verify Authentication Status Is Authenticated
     Element Should Contain    //*[contains(@id,"authStatusSection")]    
     ...                        Authenticated
     Log                        Named Credential is Authenticated
-
-Log Directory Contents
-    [Documentation]    Logs contents of important directories
-    ${tmp_contents}=    Run Process    ls -la /tmp/    shell=True
-    Log    Contents of /tmp:    level=INFO
-    Log    ${tmp_contents.stdout}    level=INFO
-    
-    ${dev_shm_contents}=    Run Process    ls -la /dev/shm/    shell=True
-    Log    Contents of /dev/shm:    level=INFO
-    Log    ${dev_shm_contents.stdout}    level=INFO
-    
-    ${chrome_contents}=    Run Process    ls -la /app/.chrome-for-testing/    shell=True
-    Log    Contents of /app/.chrome-for-testing:    level=INFO
-    Log    ${chrome_contents.stdout}    level=INFO

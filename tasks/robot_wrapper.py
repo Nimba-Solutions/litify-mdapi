@@ -56,6 +56,13 @@ class RobotWrapper(Robot):
         os.environ["PATH"] = driver_dir + os.pathsep + os.environ.get("PATH", "")
         print(f"Full PATH: {os.environ['PATH']}")
         
+        # Force Chrome binary path in environment
+        chrome_path = os.path.abspath(chrome_path)
+        print(f"Setting Chrome binary path in environment: {chrome_path}")
+        os.environ["CHROME_BINARY_PATH"] = chrome_path
+        os.environ["GOOGLE_CHROME_BINARY"] = chrome_path
+        os.environ["CHROME_BINARY"] = chrome_path
+        
         # Initialize parent
         print("Calling parent _init_options")
         super()._init_options(kwargs)
@@ -75,7 +82,6 @@ class RobotWrapper(Robot):
                 break
                 
         # Add our Chrome binary location to the options
-        chrome_path = os.path.abspath(chrome_path)  # Ensure absolute path
         print(f"Final Chrome binary path: {chrome_path}")
         
         # Create capabilities dict to force Chrome binary
@@ -86,6 +92,15 @@ class RobotWrapper(Robot):
             }
         }
         print(f"Setting capabilities: {capabilities}")
+        
+        # Print current directory context
+        print("\n=== Directory Context ===")
+        print(f"__file__: {__file__}")
+        print(f"Absolute __file__: {os.path.abspath(__file__)}")
+        print(f"Current dir: {os.getcwd()}")
+        print(f"Chrome path relative to cwd: {os.path.relpath(chrome_path, os.getcwd())}")
+        print(f"Driver path relative to cwd: {os.path.relpath(driver_path, os.getcwd())}")
+        print("=== End Directory Context ===\n")
         
         # Add both browser options and capabilities
         chrome_options = f"--binary={chrome_path.replace('\\', '/')} {' '.join(chrome_args)}"

@@ -10,15 +10,18 @@ Set Chrome Options
     Log To Console    ${options_dict}
     
     ${chrome_options}=    Evaluate    selenium.webdriver.ChromeOptions()    modules=selenium.webdriver
+    
+    # Set binary location first
+    ${CURDIR}=    Get Environment Variable    WORKSPACE    ${CURDIR}
+    ${chrome_binary}=    Join Path    ${CURDIR}    drivers    chrome-win    chrome.exe
+    Call Method    ${chrome_options}    binary_location    ${chrome_binary}
+    Log To Console    \n=== Using Chrome Binary ===
+    Log To Console    ${chrome_binary}
+    
+    # Then add arguments
     FOR    ${arg}    IN    @{options_dict}[args]
         Call Method    ${chrome_options}    add_argument    ${arg}
     END
-    
-    # Set binary location if provided
-    ${binary_location}=    Get From Dictionary    ${options_dict}    binary_location    ${None}
-    Log To Console    \n=== Binary Location ===
-    Log To Console    ${binary_location}
-    Run Keyword If    $binary_location is not None    Call Method    ${chrome_options}    binary_location    ${binary_location}
     
     # Enable logging with proper dictionary
     ${log_prefs}=    Create Dictionary    browser=ALL    driver=ALL

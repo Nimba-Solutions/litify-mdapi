@@ -17,7 +17,10 @@ class RobotWrapper(Robot):
             if isinstance(var, str) and var.startswith("BROWSER_OPTIONS:"):
                 # Parse the options and create proper format
                 chrome_args = var.split(":", 1)[1].split()
-                browser_options = {"args": chrome_args}
+                browser_options = {
+                    "args": chrome_args,
+                    "browserVersion": "116"
+                }
                 # Remove the original string version
                 self.options["vars"].pop(i)
                 # Add formatted options

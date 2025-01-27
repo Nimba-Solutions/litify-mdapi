@@ -3,10 +3,16 @@ import os
 import json
 import platform
 from tasks.setup_chrome import setup_chrome
-import winreg
+import logging
 
 class RobotWrapper(Robot):
     def _init_options(self, kwargs):
+        # Enable Selenium debug logging
+        selenium_logger = logging.getLogger('selenium.webdriver.remote.remote_connection')
+        selenium_logger.setLevel(logging.DEBUG)
+        chrome_logger = logging.getLogger('selenium.webdriver.chrome.service')
+        chrome_logger.setLevel(logging.DEBUG)
+        
         print("\n=== Starting RobotWrapper initialization ===")
         print(f"Current working directory: {os.getcwd()}")
         

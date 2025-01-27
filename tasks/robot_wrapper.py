@@ -22,7 +22,7 @@ class RobotWrapper(Robot):
         if not os.path.exists(chrome_path):
             setup_chrome()
         
-        # Force Selenium to use our Chrome
+        # Force Selenium to use our Chrome and driver
         os.environ["CHROME_BINARY"] = chrome_path
         os.environ["webdriver.chrome.driver"] = driver_path
         os.environ["SE_CHROME_BINARY"] = chrome_path
@@ -50,11 +50,11 @@ class RobotWrapper(Robot):
                 self.options["vars"].remove(var)
                 break
                 
-        # Add our Chrome binary location to the options
-        self.options["vars"].append(f"BROWSER_OPTIONS:--binary={chrome_path.replace('\\', '/')} {' '.join(chrome_args)}")
-        
-        # Add Salesforce credentials
+        # Add our Chrome binary and driver location to the options
+        chrome_options = f"--binary={chrome_path.replace('\\', '/')} {' '.join(chrome_args)}"
         self.options["vars"].extend([
+            "SELENIUM_DRIVER_PATH:" + driver_path.replace("\\", "/"),
+            "BROWSER_OPTIONS:" + chrome_options,
             f"SF_USERNAME:{self.org_config.username}",
             f"SF_PASSWORD:{self.org_config.password}",
         ])

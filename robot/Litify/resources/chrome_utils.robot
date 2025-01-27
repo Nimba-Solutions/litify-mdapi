@@ -10,7 +10,8 @@ Set Chrome Options
         Call Method    ${chrome_options}    add_argument    ${arg}
     END
     # Force Chrome version 116
-    Call Method    ${chrome_options}    set_capability    browserVersion    116
+    Call Method    ${chrome_options}    set_capability    version    116
+    Call Method    ${chrome_options}    set_capability    chrome.version    116
     # Enable logging with proper dictionary
     ${log_prefs}=    Create Dictionary    browser=ALL    driver=ALL
     Call Method    ${chrome_options}    set_capability    goog:loggingPrefs    ${log_prefs}

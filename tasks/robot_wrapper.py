@@ -6,9 +6,8 @@ from tasks.setup_chrome import setup_chrome
 
 class RobotWrapper(Robot):
     def _init_options(self, kwargs):
-        # Ensure vars exists
-        if "vars" not in self.options:
-            self.options["vars"] = []
+        # Initialize parent class first
+        super()._init_options(kwargs)
         
         # Get workspace directory and system info
         workspace = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -36,6 +35,10 @@ class RobotWrapper(Robot):
             os.chmod(driver_path, 0o755)
             os.chmod(chrome_path, 0o755)
         
+        # Ensure vars exists
+        if "vars" not in self.options:
+            self.options["vars"] = []
+        
         # Set browser options
         chrome_args = ["--headless=new", "--no-sandbox", "--incognito"]
         browser_options = {
@@ -48,8 +51,6 @@ class RobotWrapper(Robot):
             f"SF_USERNAME:{self.org_config.username}",
             f"SF_PASSWORD:{self.org_config.password}",
         ])
-        
-        super()._init_options(kwargs)
 
         # Get Chrome options defined in cumulusci.yml
         for var in self.options.get("vars", []):

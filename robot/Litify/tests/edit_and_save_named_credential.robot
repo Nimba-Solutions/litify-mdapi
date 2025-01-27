@@ -4,7 +4,7 @@ Library         cumulusci.robotframework.PageObjects
 Library         Process
 Library         cumulusci.robotframework.CumulusCI  ${ORG}
 Library         OperatingSystem
-Resource        chrome_utils.robot
+Resource        ../resources/chrome_utils.robot
 Suite Setup     Run Keywords
 ...             Log Environment Details
 ...             Log Browser Options

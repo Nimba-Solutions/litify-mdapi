@@ -10,13 +10,13 @@ class RobotWrapper(Robot):
             self.options["vars"] = []
 
         # Get Chrome options defined in cumulusci.yml
-        chrome_args = []
         for var in self.options.get("vars", []):
             if isinstance(var, str) and var.startswith("BROWSER_OPTIONS:"):
+                # Parse the options and create proper format
                 chrome_args = var.split(":", 1)[1].split()
                 browser_options = {"args": chrome_args}
+                # Add formatted options
                 self.options["vars"].extend([
-                    "BROWSER:headlesschrome",
                     f"BROWSER_OPTIONS:{json.dumps(browser_options)}",
                 ])
                 break

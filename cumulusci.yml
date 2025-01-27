@@ -114,7 +114,7 @@ tasks:
             outputdir: robot/Litify/results
             exclude: unstable
             vars:
-                - "BROWSER_OPTIONS:--headless=new --no-sandbox --incognito --disable-gpu --user-data-dir=/tmp/chrome_user_data"
+                - "BROWSER_OPTIONS:--headless=new --no-sandbox --incognito --disable-gpu"
 
     load_sample_data:
         options:

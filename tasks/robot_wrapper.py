@@ -29,17 +29,14 @@ class RobotWrapper(Robot):
         if not os.path.exists(chrome_path):
             setup_chrome()
         
-        # Force Selenium to use our Chrome and driver
-        os.environ["CHROME_BINARY"] = chrome_path
-        os.environ["webdriver.chrome.driver"] = driver_path
-        os.environ["SE_CHROME_BINARY"] = chrome_path
-        os.environ["CHROME_BINARY_PATH"] = chrome_path
-        os.environ["CHROME_DRIVER_PATH"] = driver_path
-        
         # Make executables executable on Unix systems
         if system != "windows":
             os.chmod(driver_path, 0o755)
             os.chmod(chrome_path, 0o755)
+            
+        # Force ChromeDriver path in Selenium itself
+        from selenium.webdriver.chrome.service import Service
+        Service.path = driver_path
         
         # Initialize parent
         super()._init_options(kwargs)
@@ -57,10 +54,10 @@ class RobotWrapper(Robot):
                 self.options["vars"].remove(var)
                 break
                 
-        # Add our Chrome binary and driver location to the options
+        # Add our Chrome binary location to the options
         chrome_options = f"--binary={chrome_path.replace('\\', '/')} {' '.join(chrome_args)}"
         self.options["vars"].extend([
-            "SELENIUM_DRIVER_PATH:" + driver_path.replace("\\", "/"),
+            f"BROWSER:chrome",
             "BROWSER_OPTIONS:" + chrome_options,
             f"SF_USERNAME:{self.org_config.username}",
             f"SF_PASSWORD:{self.org_config.password}",

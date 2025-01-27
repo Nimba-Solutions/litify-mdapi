@@ -24,14 +24,7 @@ def setup_chrome():
         raise Exception(f"Unsupported system: {system} {machine}")
     
     chrome_dir = f"drivers/chrome-{system}"
-    
-    # Clean up existing directories
-    if os.path.exists(chrome_dir):
-        shutil.rmtree(chrome_dir)
-    if os.path.exists("drivers/chrome-win64"):
-        shutil.rmtree("drivers/chrome-win64")
-    
-    os.makedirs(chrome_dir, exist_ok=True)
+    os.makedirs("drivers", exist_ok=True)
     
     chrome_url = f"https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/116.0.5845.96/{chrome_build}"
     print(f"Downloading Chrome 116 for {system} {machine}...")
@@ -39,18 +32,23 @@ def setup_chrome():
     
     print("Extracting Chrome...")
     with zipfile.ZipFile(io.BytesIO(response.content)) as zip_ref:
+        # Clean up existing directories
+        if os.path.exists(chrome_dir):
+            shutil.rmtree(chrome_dir)
+        if os.path.exists("drivers/chrome-win64"):
+            shutil.rmtree("drivers/chrome-win64")
+            
+        # Extract and rename
         zip_ref.extractall("drivers")
-        
-        # Handle different directory names based on platform
         if system == "windows":
-            os.rename("drivers/chrome-win64", chrome_dir)
+            shutil.move("drivers/chrome-win64", chrome_dir)
         elif system == "linux":
-            os.rename("drivers/chrome-linux64", chrome_dir)
+            shutil.move("drivers/chrome-linux64", chrome_dir)
         elif system == "darwin":
             if machine == "arm64":
-                os.rename("drivers/chrome-mac-arm64", chrome_dir)
+                shutil.move("drivers/chrome-mac-arm64", chrome_dir)
             else:
-                os.rename("drivers/chrome-mac-x64", chrome_dir)
+                shutil.move("drivers/chrome-mac-x64", chrome_dir)
     
     print("Chrome 116 setup complete!")
 

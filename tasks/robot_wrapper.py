@@ -77,12 +77,24 @@ class RobotWrapper(Robot):
         # Add our Chrome binary location to the options
         chrome_path = os.path.abspath(chrome_path)  # Ensure absolute path
         print(f"Final Chrome binary path: {chrome_path}")
+        
+        # Create capabilities dict to force Chrome binary
+        capabilities = {
+            "goog:chromeOptions": {
+                "binary": chrome_path.replace('\\', '/'),
+                "args": chrome_args
+            }
+        }
+        print(f"Setting capabilities: {capabilities}")
+        
+        # Add both browser options and capabilities
         chrome_options = f"--binary={chrome_path.replace('\\', '/')} {' '.join(chrome_args)}"
         print(f"Final Chrome options: {chrome_options}")
         
         self.options["vars"].extend([
             f"BROWSER:chrome",
             "BROWSER_OPTIONS:" + chrome_options,
+            f"SELENIUM_CAPABILITIES:{json.dumps(capabilities)}",
             f"SF_USERNAME:{self.org_config.username}",
             f"SF_PASSWORD:{self.org_config.password}",
         ])

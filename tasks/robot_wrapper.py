@@ -15,16 +15,19 @@ class RobotWrapper(Robot):
             # We're in a fetched project, use absolute paths
             driver_path = os.path.join(workspace, "drivers", "chromedriver.exe" if system == "windows" else "chromedriver")
             chrome_dir = os.path.join(workspace, "drivers", f"chrome-{system}")
+            chrome_path = os.path.join(chrome_dir,
+                "chrome.exe" if system == "windows" 
+                else "chrome" if system == "linux"
+                else "Contents/MacOS/Google Chrome")
         else:
             # We're in the main project, use relative paths
             driver_path = os.path.join("drivers", "chromedriver.exe" if system == "windows" else "chromedriver")
             chrome_dir = os.path.join("drivers", f"chrome-{system}")
+            chrome_path = os.path.join(chrome_dir,
+                "chrome.exe" if system == "windows" 
+                else "chrome" if system == "linux"
+                else "Contents/MacOS/Google Chrome")
             
-        chrome_path = os.path.join(chrome_dir,
-            "chrome.exe" if system == "windows" 
-            else "chrome" if system == "linux"
-            else "Contents/MacOS/Google Chrome")
-        
         # Install Chrome if needed
         if not os.path.exists(chrome_path):
             setup_chrome()
@@ -35,7 +38,7 @@ class RobotWrapper(Robot):
             os.chmod(chrome_path, 0o755)
             
         # Force ChromeDriver path for Selenium 3
-        os.environ["webdriver.chrome.driver"] = driver_path
+        os.environ["webdriver.chrome.driver"] = os.path.abspath(driver_path)
         
         # Initialize parent
         super()._init_options(kwargs)
@@ -54,6 +57,7 @@ class RobotWrapper(Robot):
                 break
                 
         # Add our Chrome binary location to the options
+        chrome_path = os.path.abspath(chrome_path)  # Ensure absolute path
         chrome_options = f"--binary={chrome_path.replace('\\', '/')} {' '.join(chrome_args)}"
         self.options["vars"].extend([
             f"BROWSER:chrome",

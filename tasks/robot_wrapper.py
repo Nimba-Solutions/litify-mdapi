@@ -37,10 +37,8 @@ class RobotWrapper(Robot):
             os.chmod(driver_path, 0o755)
             os.chmod(chrome_path, 0o755)
             
-        # Force Chrome paths in Selenium
-        from selenium.webdriver.chrome.options import Options
-        chrome_options = Options()
-        chrome_options.binary_location = os.path.abspath(chrome_path)
+        # Set ChromeDriver path in environment
+        os.environ["PATH"] = os.path.dirname(os.path.abspath(driver_path)) + os.pathsep + os.environ.get("PATH", "")
         
         # Initialize parent
         super()._init_options(kwargs)

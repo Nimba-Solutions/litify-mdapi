@@ -114,8 +114,8 @@ tasks:
             outputdir: robot/Litify/results
             exclude: unstable
             vars:
-                - "BROWSER:chromeheadless"
-                - "BROWSER_OPTIONS:--no-sandbox --incognito --disable-gpu --user-data-dir"
+                - "BROWSER:chrome"
+                - "BROWSER_OPTIONS:--headless=new --no-sandbox --incognito --disable-gpu --user-data-dir"
 
     install_chromedriver:
         class_path: tasks.install_chromedriver.InstallChromeDriver

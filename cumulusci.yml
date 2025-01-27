@@ -114,7 +114,8 @@ tasks:
             outputdir: robot/Litify/results
             exclude: unstable
             vars:
-                - "BROWSER_OPTIONS:--headless=new --no-sandbox --incognito --disable-gpu --user-data-dir"
+                - "BROWSER:chromeheadless"
+                - "BROWSER_OPTIONS:--no-sandbox --incognito --disable-gpu --user-data-dir"
 
     install_chromedriver:
         class_path: tasks.install_chromedriver.InstallChromeDriver
@@ -122,6 +123,15 @@ tasks:
     load_sample_data:
         options:
             drop_missing_schema: True
+
+    test_chrome:
+        description: Test Chrome setup
+        class_path: tasks.robot_wrapper.RobotWrapper
+        options:
+            suites: robot/Litify/tests/test_chrome.robot
+            vars:
+                - "BROWSER:chrome"
+                - "BROWSER_OPTIONS:--headless=new --no-sandbox --incognito"
 
 ### Flows ######################################################################
 flows:

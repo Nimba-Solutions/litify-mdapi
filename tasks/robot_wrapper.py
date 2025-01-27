@@ -22,48 +22,39 @@ class RobotWrapper(Robot):
         if not os.path.exists(chrome_path):
             setup_chrome()
         
-        # Set environment variables
-        os.environ['SE_DISABLE_DRIVER_VERSION_CHECK'] = '1'
+        # Force Selenium to use our Chrome
         os.environ["CHROME_BINARY"] = chrome_path
         os.environ["webdriver.chrome.driver"] = driver_path
+        os.environ["SE_CHROME_BINARY"] = chrome_path
+        os.environ["CHROME_BINARY_PATH"] = chrome_path
+        os.environ["CHROME_DRIVER_PATH"] = driver_path
         
         # Make executables executable on Unix systems
         if system != "windows":
             os.chmod(driver_path, 0o755)
             os.chmod(chrome_path, 0o755)
         
-        # Initialize parent first
+        # Initialize parent
         super()._init_options(kwargs)
-        
-        # Set browser options
-        chrome_args = ["--headless=new", "--no-sandbox", "--incognito"]
-        browser_options = {
-            "args": chrome_args,
-            "binary_location": chrome_path
-        }
         
         # Initialize vars if not present
         if "vars" not in self.options:
             self.options["vars"] = []
             
-        # Add our variables
-        self.options["vars"].extend([
-            f"BROWSER:chrome",
-            f"BROWSER_OPTIONS:{json.dumps(browser_options)}",
-            f"SF_USERNAME:{self.org_config.username}",
-            f"SF_PASSWORD:{self.org_config.password}",
-        ])
-
-        # Get Chrome options defined in cumulusci.yml
+        # Get Chrome options from cumulusci.yml
+        chrome_args = []
         for var in self.options.get("vars", []):
             if isinstance(var, str) and var.startswith("BROWSER_OPTIONS:"):
                 chrome_args = var.split(":", 1)[1].split()
-                browser_options = {
-                    "args": chrome_args,
-                    "binary_location": chrome_path
-                }
                 # Remove the original string version
                 self.options["vars"].remove(var)
-                # Add JSON formatted version
-                self.options["vars"].append(f"BROWSER_OPTIONS:{json.dumps(browser_options)}")
                 break
+                
+        # Add our Chrome binary location to the options
+        self.options["vars"].append(f"BROWSER_OPTIONS:--binary={chrome_path.replace('\\', '/')} {' '.join(chrome_args)}")
+        
+        # Add Salesforce credentials
+        self.options["vars"].extend([
+            f"SF_USERNAME:{self.org_config.username}",
+            f"SF_PASSWORD:{self.org_config.password}",
+        ])

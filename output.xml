@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot generator="Robot 7.0.1 (Python 3.12.1 on win32)" generated="2025-01-27T14:36:40.119194" rpa="false" schemaversion="5">
+<suite id="s1" name="Test Chrome" source="C:\Users\david\Projects\litify-mdapi\robot\Litify\tests\test_chrome.robot">
+<test id="s1-t1" name="Test Chrome Setup" line="6">
+<kw name="Log To Console" owner="BuiltIn">
+<arg>\n=== Starting Chrome Test ===</arg>
+<doc>Logs the given message to the console.</doc>
+<status status="PASS" start="2025-01-27T14:36:40.213726" elapsed="0.001001"/>
+</kw>
+<kw name="Log To Console" owner="BuiltIn">
+<arg>\n=== Browser Options ===\n${BROWSER_OPTIONS}</arg>
+<doc>Logs the given message to the console.</doc>
+<status status="PASS" start="2025-01-27T14:36:40.214727" elapsed="0.001001"/>
+</kw>
+<kw name="Open Browser" owner="SeleniumLibrary">
+<msg time="2025-01-27T14:36:40.216730" level="INFO">Opening browser 'chrome' to base url 'https://example.org'.</msg>
+<arg>https://example.org</arg>
+<arg>${BROWSER}</arg>
+<doc>Opens a new browser instance to the optional ``url``.</doc>
+<status status="PASS" start="2025-01-27T14:36:40.215728" elapsed="1.381325"/>
+</kw>
+<kw name="Page Should Contain" owner="SeleniumLibrary">
+<msg time="2025-01-27T14:36:41.614054" level="INFO">Current page contains text 'Example Domain'.</msg>
+<arg>Example Domain</arg>
+<doc>Verifies that current page contains ``text``.</doc>
+<status status="PASS" start="2025-01-27T14:36:41.598053" elapsed="0.017000"/>
+</kw>
+<kw name="Get Title" owner="SeleniumLibrary">
+<msg time="2025-01-27T14:36:41.621054" level="INFO">${title} = Example Domain</msg>
+<var>${title}</var>
+<doc>Returns the title of the current page.</doc>
+<status status="PASS" start="2025-01-27T14:36:41.615053" elapsed="0.006001"/>
+</kw>
+<kw name="Log To Console" owner="BuiltIn">
+<arg>\n=== Page Title ===\n${title}</arg>
+<doc>Logs the given message to the console.</doc>
+<status status="PASS" start="2025-01-27T14:36:41.622053" elapsed="0.000999"/>
+</kw>
+<kw name="Close Browser" owner="SeleniumLibrary" type="TEARDOWN">
+<doc>Closes the current browser.</doc>
+<status status="PASS" start="2025-01-27T14:36:41.623052" elapsed="2.139488"/>
+</kw>
+<status status="PASS" start="2025-01-27T14:36:40.213726" elapsed="3.549812"/>
+</test>
+<status status="PASS" start="2025-01-27T14:36:40.120195" elapsed="3.644347"/>
+</suite>
+<statistics>
+<total>
+<stat pass="1" fail="0" skip="0">All Tests</stat>
+</total>
+<tag>
+</tag>
+<suite>
+<stat pass="1" fail="0" skip="0" id="s1" name="Test Chrome">Test Chrome</stat>
+</suite>
+</statistics>
+<errors>
+</errors>
+</robot>

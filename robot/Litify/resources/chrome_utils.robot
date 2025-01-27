@@ -6,16 +6,29 @@ Library         OperatingSystem
 *** Keywords ***
 Set Chrome Options
     ${options_dict}=    Evaluate    json.loads('''${BROWSER_OPTIONS}''')    json
+    Log To Console    \n=== Chrome Options Dictionary ===
+    Log To Console    ${options_dict}
+    
     ${chrome_options}=    Evaluate    selenium.webdriver.ChromeOptions()    modules=selenium.webdriver
     FOR    ${arg}    IN    @{options_dict}[args]
         Call Method    ${chrome_options}    add_argument    ${arg}
     END
+    
     # Set binary location if provided
     ${binary_location}=    Get From Dictionary    ${options_dict}    binary_location    ${None}
+    Log To Console    \n=== Binary Location ===
+    Log To Console    ${binary_location}
     Run Keyword If    $binary_location is not None    Call Method    ${chrome_options}    binary_location    ${binary_location}
+    
     # Enable logging with proper dictionary
     ${log_prefs}=    Create Dictionary    browser=ALL    driver=ALL
     Call Method    ${chrome_options}    set_capability    goog:loggingPrefs    ${log_prefs}
+    
+    # Log final options
+    ${options_str}=    Evaluate    str($chrome_options.to_capabilities())    modules=selenium.webdriver
+    Log To Console    \n=== Final Chrome Options ===
+    Log To Console    ${options_str}
+    
     RETURN    ${chrome_options}
 
 Log Chrome Options
@@ -24,6 +37,8 @@ Log Chrome Options
     Log To Console    ${BROWSER_OPTIONS}
     ${CURDIR}=    Get Environment Variable    WORKSPACE    ${CURDIR}
     ${driver_path}=    Join Path    ${CURDIR}    drivers    chromedriver.exe
+    Log To Console    \n=== Using ChromeDriver ===
+    Log To Console    ${driver_path}
     Create Webdriver    Chrome    executable_path=${driver_path}    chrome_options=${chrome_options}
     ${selenium}=    Get Library Instance    SeleniumLibrary
     ${driver}=    Set Variable    ${selenium.driver}

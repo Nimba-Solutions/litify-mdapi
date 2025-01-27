@@ -10,9 +10,16 @@ class RobotWrapper(Robot):
         workspace = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         system = platform.system().lower()
         
-        # Set paths based on platform
-        driver_path = os.path.join(workspace, "drivers", "chromedriver.exe" if system == "windows" else "chromedriver")
-        chrome_dir = os.path.join(workspace, "drivers", f"chrome-{system}")
+        # Check if we're in a .cci project
+        if ".cci" in workspace:
+            # We're in a fetched project, use absolute paths
+            driver_path = os.path.join(workspace, "drivers", "chromedriver.exe" if system == "windows" else "chromedriver")
+            chrome_dir = os.path.join(workspace, "drivers", f"chrome-{system}")
+        else:
+            # We're in the main project, use relative paths
+            driver_path = os.path.join("drivers", "chromedriver.exe" if system == "windows" else "chromedriver")
+            chrome_dir = os.path.join("drivers", f"chrome-{system}")
+            
         chrome_path = os.path.join(chrome_dir,
             "chrome.exe" if system == "windows" 
             else "chrome" if system == "linux"

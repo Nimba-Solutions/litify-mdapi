@@ -129,7 +129,7 @@ class RobotWrapper(Robot):
         print("=== End Directory Context ===\n")
         
         # Add both browser options and capabilities
-        chrome_options = f"--binary={os.path.normpath(chrome_path).replace(os.sep, '/')} --webdriver={os.path.normpath(driver_path).replace(os.sep, '/')} {' '.join(chrome_args)}"
+        chrome_options = f"--binary={os.path.normpath(chrome_path).replace(os.sep, '/')} --webdriver={os.path.normpath(os.path.abspath(driver_path)).replace(os.sep, '/')} {' '.join(chrome_args)}"
         print(f"Final Chrome options: {chrome_options}")
         
         self.options["vars"].extend([

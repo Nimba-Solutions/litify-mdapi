@@ -198,3 +198,5 @@ flows:
                 task: grant_connected_app
             9:
                 task: assign_litify_permission_sets
+            10:
+                task: ensure_password

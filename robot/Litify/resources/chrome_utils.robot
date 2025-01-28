@@ -11,9 +11,8 @@ Set Chrome Options
     
     ${chrome_options}=    Evaluate    selenium.webdriver.ChromeOptions()    modules=selenium.webdriver
     
-    # Set binary location first
-    ${CURDIR}=    Get Environment Variable    WORKSPACE    ${CURDIR}
-    ${chrome_binary}=    Join Path    ${CURDIR}    drivers    chrome-win    chrome.exe
+    # Set binary location from environment
+    ${chrome_binary}=    Get Environment Variable    CHROME_BINARY_PATH
     Call Method    ${chrome_options}    binary_location    ${chrome_binary}
     Log To Console    \n=== Using Chrome Binary ===
     Log To Console    ${chrome_binary}
@@ -38,8 +37,7 @@ Log Chrome Options
     ${chrome_options}=    Set Chrome Options
     Log To Console    \n=== REQUESTED Chrome Options (from BROWSER_OPTIONS) ===
     Log To Console    ${BROWSER_OPTIONS}
-    ${CURDIR}=    Get Environment Variable    WORKSPACE    ${CURDIR}
-    ${driver_path}=    Join Path    ${CURDIR}    drivers    chromedriver.exe
+    ${driver_path}=    Get Environment Variable    CHROMEDRIVER_PATH
     Log To Console    \n=== Using ChromeDriver ===
     Log To Console    ${driver_path}
     Create Webdriver    Chrome    executable_path=${driver_path}    chrome_options=${chrome_options}

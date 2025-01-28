@@ -86,6 +86,9 @@ class RobotWrapper(Robot):
         os.environ["GOOGLE_CHROME_BINARY"] = chrome_path
         os.environ["CHROME_BINARY"] = chrome_path
         
+        # Set ChromeDriver service path
+        os.environ["CHROMEDRIVER_PATH"] = os.path.abspath(driver_path)
+        
         # Initialize parent
         print("Calling parent _init_options")
         super()._init_options(kwargs)
@@ -107,7 +110,7 @@ class RobotWrapper(Robot):
         # Add our Chrome binary location to the options
         print(f"Final Chrome binary path: {chrome_path}")
         
-        # Create capabilities dict to force Chrome binary
+        # Create capabilities dict to force Chrome binary and driver
         capabilities = {
             "goog:chromeOptions": {
                 "binary": os.path.normpath(chrome_path).replace(os.sep, '/'),
@@ -126,7 +129,7 @@ class RobotWrapper(Robot):
         print("=== End Directory Context ===\n")
         
         # Add both browser options and capabilities
-        chrome_options = f"--binary={os.path.normpath(chrome_path).replace(os.sep, '/')} {' '.join(chrome_args)}"
+        chrome_options = f"--binary={os.path.normpath(chrome_path).replace(os.sep, '/')} --webdriver={os.path.normpath(driver_path).replace(os.sep, '/')} {' '.join(chrome_args)}"
         print(f"Final Chrome options: {chrome_options}")
         
         self.options["vars"].extend([

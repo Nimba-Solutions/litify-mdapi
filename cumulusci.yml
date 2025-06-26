@@ -1,10 +1,8 @@
-minimum_cumulusci_version: "3.90.0"
+minimum_cumulusci_version: "3.84.0"
 project:
-    name: Litify
-    dependencies:
-        - version_id: 04t1T0000003w1I
+    name: Litify-MDAPI
     package:
-        name: Litify
+        name: Litify-MDAPI
         api_version: "61.0"
     git:
         default_branch: "main"
